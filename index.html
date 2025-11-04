@@ -105,11 +105,13 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 80px;
+            font-size: 48px;
+            font-weight: bold;
+            color: #fff;
             background: linear-gradient(135deg, #ff8c42, #ff6b35);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4),
                         inset 0 -5px 10px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
             border: 4px solid rgba(255, 200, 150, 0.3);
         }
 
@@ -390,7 +392,7 @@
     <!-- Main Container -->
     <div class="container">
         <!-- Title Section -->
-        <h1 class="title">🌮 The Taste of Choice 🌮</h1>
+        <h1 class="title">The Taste of Choice</h1>
         <p class="subtitle">A Night Market Story</p>
 
         <!-- Progress Tracker -->
@@ -402,7 +404,7 @@
 
         <!-- Customer Portrait -->
         <div class="customer-portrait" id="customerPortrait">
-            🧑‍💼
+            ?
         </div>
 
         <!-- Choice Stage Indicator -->
@@ -426,7 +428,7 @@
 
         <!-- Restart Button (hidden initially) -->
         <button class="restart-btn hidden" id="restartBtn" onclick="restartStory()">
-            🔄 Start New Shift
+            Start New Shift
         </button>
     </div>
 
@@ -447,7 +449,8 @@
         const customers = [
             {
                 name: "Office Worker",
-                emoji: "🧑‍💼",
+                initials: "OW",
+                portraitColor: "linear-gradient(135deg, #5c7cba, #3d5a8c)",
                 description: "A tired office worker approaches, loosening their tie. The weight of a long day shows in their eyes.",
                 backgroundColor: "#2c4a6e",
                 stages: [
@@ -537,7 +540,8 @@
             },
             {
                 name: "Street Artist",
-                emoji: "🎨",
+                initials: "SA",
+                portraitColor: "linear-gradient(135deg, #e91e63, #9c27b0)",
                 description: "A paint-splattered artist bounces up to your cart, vibrant and energetic despite the late hour.",
                 backgroundColor: "#4a1f4a",
                 stages: [
@@ -627,7 +631,8 @@
             },
             {
                 name: "Elderly Grandmother",
-                emoji: "👵",
+                initials: "EG",
+                portraitColor: "linear-gradient(135deg, #d4a574, #a0826d)",
                 description: "An elderly woman with kind eyes and a gentle smile approaches slowly, supporting herself with a cane.",
                 backgroundColor: "#3a2a1a",
                 stages: [
@@ -749,7 +754,8 @@
 
             // Update customer portrait
             const portraitEl = document.getElementById('customerPortrait');
-            portraitEl.textContent = customer.emoji;
+            portraitEl.textContent = customer.initials;
+            portraitEl.style.background = customer.portraitColor;
             portraitEl.classList.add('fade-in');
 
             // Update stage title
@@ -836,7 +842,7 @@
             // Store customer data
             storyState.customerData.push({
                 name: customer.name,
-                emoji: customer.emoji,
+                initials: customer.initials,
                 choices: [...storyState.choices],
                 outcome: outcomeMessage
             });
@@ -845,7 +851,7 @@
             const narrativeEl = document.getElementById('narrative');
             narrativeEl.innerHTML = `
                 <div class="outcome-card fade-in">
-                    <div class="outcome-title">${customer.emoji} ${customer.name}'s Story</div>
+                    <div class="outcome-title">${customer.name}'s Story</div>
                     <div class="outcome-description">${outcomeMessage}</div>
                 </div>
             `;
@@ -866,7 +872,7 @@
                     // More customers to serve
                     const nextBtn = document.createElement('button');
                     nextBtn.className = 'choice-btn fade-in';
-                    nextBtn.textContent = `Next Customer ➜`;
+                    nextBtn.textContent = 'Next Customer';
                     nextBtn.onclick = nextCustomer;
                     choicesContainer.appendChild(nextBtn);
                 } else {
@@ -894,7 +900,7 @@
 
             let summaryHTML = `
                 <div class="outcome-card fade-in">
-                    <div class="outcome-title">✨ Your Night at the Market ✨</div>
+                    <div class="outcome-title">Your Night at the Market</div>
                     <div class="outcome-description" style="text-align: left; padding: 20px 0;">
                         <p style="text-align: center; margin-bottom: 20px; font-style: italic;">
                             Three souls came to your cart tonight. Three stories shared over tacos.
@@ -904,7 +910,7 @@
             storyState.customerData.forEach((data, index) => {
                 summaryHTML += `
                     <p style="margin: 15px 0; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px;">
-                        <strong style="color: #ffd700;">${data.emoji} ${data.name}:</strong><br>
+                        <strong style="color: #ffd700;">${data.name}:</strong><br>
                         <span style="color: #f5e6d3; font-size: 0.95em;">${data.outcome}</span>
                     </p>
                 `;
@@ -916,14 +922,19 @@
                         creates a story that lingers long after the food is gone.
                     </p>
                     <p style="text-align: center; margin-top: 15px; font-style: italic; color: #d4a574;">
-                        Thank you for bringing warmth to the night. 🌮✨
+                        Thank you for bringing warmth to the night.
                     </p>
                     </div>
                 </div>
             `;
 
             document.getElementById('narrative').innerHTML = summaryHTML;
-            document.getElementById('customerPortrait').textContent = '🌮';
+
+            // Show completion portrait
+            const portraitEl = document.getElementById('customerPortrait');
+            portraitEl.textContent = '✓';
+            portraitEl.style.background = 'linear-gradient(135deg, #4caf50, #45a049)';
+
             document.getElementById('choices').innerHTML = '';
             document.getElementById('restartBtn').classList.remove('hidden');
 
@@ -959,7 +970,11 @@
 
             // Reset UI
             document.getElementById('choiceStage').textContent = 'Welcome';
-            document.getElementById('customerPortrait').textContent = '🧑‍💼';
+
+            const portraitEl = document.getElementById('customerPortrait');
+            portraitEl.textContent = '?';
+            portraitEl.style.background = 'linear-gradient(135deg, #ff8c42, #ff6b35)';
+
             document.getElementById('narrative').textContent =
                 'The night market hums with life. Steam rises from food stalls, mixing with laughter and music. You stand behind your taco cart, ready to serve. Your first customer approaches...';
 
