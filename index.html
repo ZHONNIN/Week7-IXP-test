@@ -3,897 +3,240 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Taste of Choice</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            color: #fff;
-        }
-
-        /* Scene Container */
-        .scene {
-            position: absolute;
-            width: 100%;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 1s ease-in-out;
-            pointer-events: none;
-            padding: 2rem;
-        }
-
-        .scene.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        /* Intro Scene */
-        #intro {
-            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 50%, #fdc830 100%);
-            text-align: center;
-        }
-
-        #intro h1 {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
-            font-weight: 800;
-            letter-spacing: 2px;
-        }
-
-        #intro p {
-            font-size: 1.8rem;
-            margin-bottom: 3rem;
-            font-style: italic;
-            opacity: 0.9;
-        }
-
-        /* Buttons */
-        .btn {
-            padding: 1.2rem 3rem;
-            font-size: 1.3rem;
-            background: rgba(255, 255, 255, 0.95);
-            color: #ff6b35;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: bold;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
-        }
-
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            background: #fff;
-        }
-
-        .btn:active {
-            transform: translateY(-1px);
-        }
-
-        /* Customer Scene */
-        #customer-scene {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-        }
-
-        .customer-container {
-            max-width: 900px;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 3rem;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-        }
-
-        .customer-avatar {
-            width: 120px;
-            height: 120px;
-            background: linear-gradient(135deg, #ff6b35, #fdc830);
-            border-radius: 50%;
-            margin: 0 auto 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 4rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-
-        .dialogue-box {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 2rem;
-            border-radius: 15px;
-            min-height: 150px;
-            margin-bottom: 2rem;
-            border-left: 5px solid #fdc830;
-        }
-
-        .dialogue-text {
-            font-size: 1.3rem;
-            line-height: 1.8;
-            color: #fff;
-        }
-
-        .choices-container {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .choice-btn {
-            padding: 1.2rem 2rem;
-            font-size: 1.1rem;
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: left;
-        }
-
-        .choice-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: #fdc830;
-            transform: translateX(10px);
-        }
-
-        .choice-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Cooking Scene */
-        #cooking-scene {
-            background: linear-gradient(135deg, #e85d04 0%, #dc2f02 100%);
-        }
-
-        .cooking-container {
-            max-width: 1000px;
-            width: 100%;
-            text-align: center;
-        }
-
-        .cooking-container h2 {
-            font-size: 3rem;
-            margin-bottom: 2rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .cooking-area {
-            display: flex;
-            gap: 3rem;
-            align-items: flex-start;
-            justify-content: center;
-        }
-
-        .ingredients-shelf {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 2rem;
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-        }
-
-        .ingredients-shelf h3 {
-            margin-bottom: 1.5rem;
-            font-size: 1.5rem;
-        }
-
-        .ingredients-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-        }
-
-        .ingredient {
-            width: 100px;
-            height: 100px;
-            background: rgba(255, 255, 255, 0.25);
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: grab;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-        }
-
-        .ingredient:hover {
-            transform: scale(1.1);
-            border-color: #fdc830;
-        }
-
-        .ingredient:active {
-            cursor: grabbing;
-        }
-
-        .ingredient-icon {
-            font-size: 3rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .ingredient-name {
-            font-size: 0.9rem;
-        }
-
-        .pan-area {
-            width: 350px;
-            height: 350px;
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 50%;
-            border: 5px dashed rgba(255, 255, 255, 0.4);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            transition: all 0.3s ease;
-        }
-
-        .pan-area.drag-over {
-            border-color: #fdc830;
-            background: rgba(253, 200, 48, 0.2);
-            transform: scale(1.05);
-        }
-
-        .pan-icon {
-            font-size: 5rem;
-            margin-bottom: 1rem;
-        }
-
-        .pan-text {
-            font-size: 1.2rem;
-            opacity: 0.8;
-        }
-
-        .pan-contents {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .pan-ingredient {
-            font-size: 2.5rem;
-            animation: sizzle 0.5s ease-out;
-        }
-
-        @keyframes sizzle {
-            0% {
-                transform: scale(0) rotate(0deg);
-                opacity: 0;
-            }
-            50% {
-                transform: scale(1.3) rotate(180deg);
-            }
-            100% {
-                transform: scale(1) rotate(360deg);
-                opacity: 1;
-            }
-        }
-
-        .smoke {
-            position: absolute;
-            font-size: 3rem;
-            opacity: 0;
-            animation: smoke-rise 2s ease-out forwards;
-        }
-
-        @keyframes smoke-rise {
-            0% {
-                transform: translateY(0) scale(0.5);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100px) scale(2);
-                opacity: 0;
-            }
-        }
-
-        /* Outcome Scene */
-        #outcome-scene {
-            background: linear-gradient(135deg, #06ffa5 0%, #00d4ff 100%);
-            text-align: center;
-        }
-
-        .outcome-container {
-            max-width: 800px;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            padding: 3rem;
-            border-radius: 20px;
-        }
-
-        .outcome-container h2 {
-            font-size: 3rem;
-            margin-bottom: 2rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .summary-card {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 2rem;
-            border-radius: 15px;
-            margin-bottom: 2rem;
-        }
-
-        .summary-card p {
-            font-size: 1.4rem;
-            line-height: 2;
-            margin-bottom: 1rem;
-        }
-
-        .taco-illustration {
-            font-size: 8rem;
-            margin: 2rem 0;
-            animation: glow 2s ease-in-out infinite;
-        }
-
-        @keyframes glow {
-            0%, 100% {
-                text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-                transform: scale(1);
-            }
-            50% {
-                text-shadow: 0 0 40px rgba(255, 255, 255, 0.8);
-                transform: scale(1.1);
-            }
-        }
-
-        /* Progress Indicator */
-        .progress-indicator {
-            position: absolute;
-            top: 2rem;
-            right: 2rem;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 1rem 1.5rem;
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-        }
-
-        /* Typing Cursor */
-        .typing-cursor {
-            display: inline-block;
-            width: 2px;
-            height: 1.2em;
-            background: #fdc830;
-            margin-left: 3px;
-            animation: blink 0.7s infinite;
-        }
-
-        @keyframes blink {
-            0%, 49% { opacity: 1; }
-            50%, 100% { opacity: 0; }
-        }
-
-        /* Hidden Class */
-        .hidden {
-            display: none !important;
-        }
-
-        /* Fade animations */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
-    </style>
+    <title>Build Your Self - Interactive Identity Configurator</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- SCENE 1: INTRO -->
-    <div id="intro" class="scene active">
-        <h1>The Taste of Choice</h1>
-        <p>Every flavor tells a story.</p>
-        <button class="btn" onclick="startGame()">Start Your Taco Stand</button>
+    <!-- Background gradient overlay -->
+    <div class="gradient-bg" id="gradientBg"></div>
+
+    <!-- Intro Scene -->
+    <div class="scene active" id="introScene">
+        <div class="intro-content">
+            <h1 class="main-title">Build Your Self</h1>
+            <p class="subtitle">Configure your identity. One choice at a time.</p>
+            <button class="start-btn" id="startBtn">Start Configuration</button>
+        </div>
     </div>
 
-    <!-- SCENE 2: CUSTOMER SCENES -->
-    <div id="customer-scene" class="scene">
-        <div class="progress-indicator">
-            <span id="customer-progress">Customer 1 of 3</span>
-        </div>
-        <div class="customer-container">
-            <div class="customer-avatar" id="customer-avatar">👤</div>
-            <div class="dialogue-box">
-                <div class="dialogue-text" id="dialogue-text"></div>
+    <!-- Configurator Scene -->
+    <div class="scene" id="configuratorScene">
+        <div class="configurator-container">
+            <!-- Header -->
+            <div class="header">
+                <h2>Identity Configurator</h2>
+                <div class="progress-indicator">
+                    <span id="progressText">Select your attributes</span>
+                </div>
             </div>
-            <div class="choices-container" id="choices-container"></div>
-        </div>
-    </div>
 
-    <!-- SCENE 3: COOKING INTERACTION -->
-    <div id="cooking-scene" class="scene">
-        <div class="cooking-container">
-            <h2>Make Your Own Taco</h2>
-            <p style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9;">Drag ingredients into the pan</p>
-            <div class="cooking-area">
-                <div class="ingredients-shelf">
-                    <h3>Ingredients</h3>
-                    <div class="ingredients-grid" id="ingredients-grid">
-                        <div class="ingredient" draggable="true" data-ingredient="beef">
-                            <div class="ingredient-icon">🥩</div>
-                            <div class="ingredient-name">Beef</div>
-                        </div>
-                        <div class="ingredient" draggable="true" data-ingredient="chicken">
-                            <div class="ingredient-icon">🍗</div>
-                            <div class="ingredient-name">Chicken</div>
-                        </div>
-                        <div class="ingredient" draggable="true" data-ingredient="beans">
-                            <div class="ingredient-icon">🫘</div>
-                            <div class="ingredient-name">Beans</div>
-                        </div>
-                        <div class="ingredient" draggable="true" data-ingredient="avocado">
-                            <div class="ingredient-icon">🥑</div>
-                            <div class="ingredient-name">Avocado</div>
-                        </div>
-                        <div class="ingredient" draggable="true" data-ingredient="chili">
-                            <div class="ingredient-icon">🌶️</div>
-                            <div class="ingredient-name">Chili</div>
-                        </div>
-                        <div class="ingredient" draggable="true" data-ingredient="onion">
-                            <div class="ingredient-icon">🧅</div>
-                            <div class="ingredient-name">Onion</div>
-                        </div>
-                        <div class="ingredient" draggable="true" data-ingredient="tomato">
-                            <div class="ingredient-icon">🍅</div>
-                            <div class="ingredient-name">Tomato</div>
-                        </div>
-                        <div class="ingredient" draggable="true" data-ingredient="cheese">
-                            <div class="ingredient-icon">🧀</div>
-                            <div class="ingredient-name">Cheese</div>
-                        </div>
+            <!-- Car Preview (SVG) -->
+            <div class="car-preview">
+                <svg id="carSilhouette" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Simplified futuristic car silhouette -->
+                    <defs>
+                        <linearGradient id="carGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#888;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#bbb;stop-opacity:1" />
+                        </linearGradient>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                            <feMerge>
+                                <feMergeNode in="coloredBlur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                    </defs>
+
+                    <!-- Car body -->
+                    <path id="carBody" d="M 50 120 L 80 80 L 140 70 L 180 70 L 220 80 L 240 90 L 320 100 L 350 120 L 350 140 L 330 145 L 320 140 L 300 140 L 290 145 L 110 145 L 100 140 L 80 140 L 70 145 L 50 140 Z"
+                          fill="url(#carGradient)"
+                          stroke="#555"
+                          stroke-width="2"
+                          filter="url(#glow)"/>
+
+                    <!-- Windows -->
+                    <path d="M 90 85 L 120 75 L 135 75 L 145 85 Z" fill="rgba(100,150,200,0.3)" stroke="#333" stroke-width="1"/>
+                    <path d="M 185 75 L 215 85 L 230 95 L 180 85 Z" fill="rgba(100,150,200,0.3)" stroke="#333" stroke-width="1"/>
+
+                    <!-- Wheels -->
+                    <circle cx="100" cy="145" r="18" fill="#333" stroke="#555" stroke-width="2"/>
+                    <circle cx="100" cy="145" r="10" fill="#666"/>
+                    <circle cx="310" cy="145" r="18" fill="#333" stroke="#555" stroke-width="2"/>
+                    <circle cx="310" cy="145" r="10" fill="#666"/>
+                </svg>
+                <p class="reflection-text" id="reflectionText">Your journey begins here...</p>
+            </div>
+
+            <!-- Configuration Categories -->
+            <div class="config-section">
+                <!-- Category 1: Shell Color -->
+                <div class="category" data-category="shell">
+                    <h3 class="category-title">Shell Color <span class="category-subtitle">Personality Tone</span></h3>
+                    <div class="options">
+                        <button class="option-btn" data-value="arctic" data-color="#d4e8f0" data-gradient="linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
+                            <span class="option-name">Arctic White</span>
+                            <span class="option-desc">calm, detached, logical</span>
+                        </button>
+                        <button class="option-btn" data-value="crimson" data-color="#e63946" data-gradient="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)">
+                            <span class="option-name">Crimson Pulse</span>
+                            <span class="option-desc">passionate, bold, impulsive</span>
+                        </button>
+                        <button class="option-btn" data-value="obsidian" data-color="#2b2d42" data-gradient="linear-gradient(135deg, #4b4b4b 0%, #1a1a1a 100%)">
+                            <span class="option-name">Obsidian Black</span>
+                            <span class="option-desc">mysterious, introspective, secretive</span>
+                        </button>
                     </div>
                 </div>
-                <div class="pan-area" id="pan-area">
-                    <div class="pan-icon">🍳</div>
-                    <div class="pan-text">Drop ingredients here</div>
-                    <div class="pan-contents" id="pan-contents"></div>
+
+                <!-- Category 2: Engine Type -->
+                <div class="category" data-category="engine">
+                    <h3 class="category-title">Engine Type <span class="category-subtitle">Motivation Source</span></h3>
+                    <div class="options">
+                        <button class="option-btn" data-value="desire">
+                            <span class="option-name">Desire Engine</span>
+                            <span class="option-desc">driven by longing and need</span>
+                        </button>
+                        <button class="option-btn" data-value="belief">
+                            <span class="option-name">Belief Engine</span>
+                            <span class="option-desc">powered by conviction and purpose</span>
+                        </button>
+                        <button class="option-btn" data-value="fear">
+                            <span class="option-name">Fear Engine</span>
+                            <span class="option-desc">powered by anxiety and survival instinct</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Category 3: Driving Mode -->
+                <div class="category" data-category="mode">
+                    <h3 class="category-title">Driving Mode <span class="category-subtitle">Lifestyle Attitude</span></h3>
+                    <div class="options">
+                        <button class="option-btn" data-value="explorer">
+                            <span class="option-name">Explorer</span>
+                            <span class="option-desc">seeks new experiences</span>
+                        </button>
+                        <button class="option-btn" data-value="balancer">
+                            <span class="option-name">Balancer</span>
+                            <span class="option-desc">maintains harmony</span>
+                        </button>
+                        <button class="option-btn" data-value="escapist">
+                            <span class="option-name">Escapist</span>
+                            <span class="option-desc">runs away from pressure</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Category 4: Interior Material -->
+                <div class="category" data-category="interior">
+                    <h3 class="category-title">Interior Material <span class="category-subtitle">Emotional Texture</span></h3>
+                    <div class="options">
+                        <button class="option-btn" data-value="velvet">
+                            <span class="option-name">Soft Velvet</span>
+                            <span class="option-desc">empathetic, gentle</span>
+                        </button>
+                        <button class="option-btn" data-value="steel">
+                            <span class="option-name">Polished Steel</span>
+                            <span class="option-desc">rational, reserved</span>
+                        </button>
+                        <button class="option-btn" data-value="leather">
+                            <span class="option-name">Raw Leather</span>
+                            <span class="option-desc">emotional, honest</span>
+                        </button>
+                    </div>
                 </div>
             </div>
-            <div style="margin-top: 2rem;">
-                <button class="btn hidden" id="finish-cooking-btn" onclick="showOutcome()">Complete Your Creation</button>
-            </div>
+
+            <!-- Complete Configuration Button -->
+            <button class="complete-btn hidden" id="completeBtn">Generate Persona Vehicle</button>
         </div>
     </div>
 
-    <!-- SCENE 4: OUTCOME -->
-    <div id="outcome-scene" class="scene">
-        <div class="outcome-container">
-            <h2>Night Market Closed</h2>
-            <div class="summary-card">
-                <p>You've served 3 customers tonight.</p>
-                <p>Every choice changed someone's mood.</p>
-                <p>Every flavor left a story behind.</p>
+    <!-- Result Scene -->
+    <div class="scene" id="resultScene">
+        <div class="result-container">
+            <h2 class="result-title">Your Persona Vehicle</h2>
+
+            <!-- Result Car Preview -->
+            <div class="result-car-preview">
+                <svg id="resultCarSilhouette" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="resultCarGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#888;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#bbb;stop-opacity:1" />
+                        </linearGradient>
+                        <filter id="resultGlow">
+                            <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
+                            <feMerge>
+                                <feMergeNode in="coloredBlur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                    </defs>
+
+                    <path id="resultCarBody" d="M 50 120 L 80 80 L 140 70 L 180 70 L 220 80 L 240 90 L 320 100 L 350 120 L 350 140 L 330 145 L 320 140 L 300 140 L 290 145 L 110 145 L 100 140 L 80 140 L 70 145 L 50 140 Z"
+                          fill="url(#resultCarGradient)"
+                          stroke="#555"
+                          stroke-width="2"
+                          filter="url(#resultGlow)"/>
+
+                    <path d="M 90 85 L 120 75 L 135 75 L 145 85 Z" fill="rgba(100,150,200,0.3)" stroke="#333" stroke-width="1"/>
+                    <path d="M 185 75 L 215 85 L 230 95 L 180 85 Z" fill="rgba(100,150,200,0.3)" stroke="#333" stroke-width="1"/>
+
+                    <circle cx="100" cy="145" r="18" fill="#333" stroke="#555" stroke-width="2"/>
+                    <circle cx="100" cy="145" r="10" fill="#666"/>
+                    <circle cx="310" cy="145" r="18" fill="#333" stroke="#555" stroke-width="2"/>
+                    <circle cx="310" cy="145" r="10" fill="#666"/>
+                </svg>
             </div>
-            <div class="taco-illustration">🌮</div>
-            <button class="btn" onclick="restartGame()">Restart the Night</button>
+
+            <!-- Persona Card -->
+            <div class="persona-card">
+                <h3 class="persona-name" id="personaName">Model X-00: The Unknown Self</h3>
+
+                <div class="persona-specs">
+                    <div class="spec-item">
+                        <span class="spec-label">Shell:</span>
+                        <span class="spec-value" id="specShell">-</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Engine:</span>
+                        <span class="spec-value" id="specEngine">-</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Mode:</span>
+                        <span class="spec-value" id="specMode">-</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Interior:</span>
+                        <span class="spec-value" id="specInterior">-</span>
+                    </div>
+                </div>
+
+                <p class="persona-description" id="personaDescription">
+                    Your persona awaits configuration...
+                </p>
+            </div>
+
+            <div class="ending-message">
+                <p>"Identity is an ongoing configuration."</p>
+            </div>
+
+            <button class="rebuild-btn" id="rebuildBtn">Rebuild Yourself</button>
         </div>
     </div>
 
-    <!-- Audio Elements -->
-    <audio id="ambient-sound" loop>
-        <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=" type="audio/wav">
+    <!-- Audio elements (placeholder) -->
+    <audio id="clickSound" preload="auto">
+        <!-- <source src="click.wav" type="audio/wav"> -->
     </audio>
-    <audio id="sizzle-sound">
-        <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=" type="audio/wav">
+    <audio id="ambientSound" loop preload="auto">
+        <!-- <source src="ambient.mp3" type="audio/mp3"> -->
+    </audio>
+    <audio id="engineSound" preload="auto">
+        <!-- <source src="engine.wav" type="audio/wav"> -->
     </audio>
 
-    <script>
-        // ============================================
-        // GAME STATE
-        // ============================================
-        const gameState = {
-            currentCustomer: 0,
-            currentRound: 0,
-            customerChoices: [],
-            addedIngredients: []
-        };
-
-        // ============================================
-        // CUSTOMER DATA
-        // ============================================
-        const customers = [
-            {
-                name: "Office Worker",
-                avatar: "💼",
-                intro: "A tired man in a suit walks up to your stand. He says: \"It's been a long day... I just need something simple to keep me going.\"",
-                rounds: [
-                    {
-                        prompt: "What kind of taco will you make?",
-                        choices: [
-                            { text: "Traditional taco (soft beef & onion)", reaction: "He smiles slightly: \"Ah... comfort food. Feels like home.\"" },
-                            { text: "Spicy taco (extra chili)", reaction: "He laughs: \"That's strong! It woke me up.\"" },
-                            { text: "Experimental taco (fusion with pineapple)", reaction: "He blinks: \"Pineapple? Unexpected... but nice.\"" }
-                        ]
-                    },
-                    {
-                        prompt: "How do you interact with him?",
-                        choices: [
-                            { text: "Friendly and talkative", reaction: "\"You remind me of my colleague who always cheers people up.\"" },
-                            { text: "Quiet and respectful", reaction: "\"Thanks for just listening. Silence is rare these days.\"" },
-                            { text: "Curious and playful", reaction: "\"You really notice details, don't you?\"" }
-                        ]
-                    },
-                    {
-                        prompt: "How will you present the taco?",
-                        choices: [
-                            { text: "Simple plate", reaction: "\"Perfect. Straightforward.\"" },
-                            { text: "Artistic drizzle", reaction: "\"Didn't expect art from street food!\"" },
-                            { text: "Wrapped in foil 'to go'", reaction: "\"Thanks, I'll eat on the way home.\"" }
-                        ]
-                    }
-                ]
-            },
-            {
-                name: "Immigrant Woman",
-                avatar: "🧳",
-                intro: "A woman carrying a small suitcase stops by. She says: \"Your food smells familiar... but also different. I just arrived in this city.\"",
-                rounds: [
-                    {
-                        prompt: "What kind of taco will you make?",
-                        choices: [
-                            { text: "Traditional taco (corn tortilla, beef)", reaction: "\"This reminds me of home. Thank you.\"" },
-                            { text: "Fusion taco (mango salsa & chicken)", reaction: "\"It's like... two places meeting in one bite.\"" },
-                            { text: "Vegetarian taco (beans & avocado)", reaction: "\"Light and fresh, maybe it's time to start new.\"" }
-                        ]
-                    },
-                    {
-                        prompt: "How do you greet her?",
-                        choices: [
-                            { text: "Warm welcome", reaction: "\"You make me feel like I belong.\"" },
-                            { text: "Respectful distance", reaction: "\"Polite... just like in the airport.\"" },
-                            { text: "Light humor", reaction: "\"Haha, maybe laughter is the same in every language.\"" }
-                        ]
-                    },
-                    {
-                        prompt: "How will you present the taco?",
-                        choices: [
-                            { text: "Handmade plate", reaction: "\"It feels made with care.\"" },
-                            { text: "Paper wrap", reaction: "\"I'll eat it while I walk — like a journey.\"" },
-                            { text: "Bright colored garnish", reaction: "\"So colorful... like the streets I miss.\"" }
-                        ]
-                    }
-                ]
-            },
-            {
-                name: "Art Student",
-                avatar: "🎨",
-                intro: "A quiet young artist with paint on her hands appears. She says: \"I'm searching for inspiration... maybe flavor can spark it.\"",
-                rounds: [
-                    {
-                        prompt: "What kind of taco will you make?",
-                        choices: [
-                            { text: "Minimal taco (just essentials)", reaction: "\"So clean... like a blank canvas.\"" },
-                            { text: "Colorful taco (lots of mix)", reaction: "\"This is chaos, I love it.\"" },
-                            { text: "Texture experiment (crispy shell)", reaction: "\"Crunchy rhythm, like a brushstroke.\"" }
-                        ]
-                    },
-                    {
-                        prompt: "How do you engage with her?",
-                        choices: [
-                            { text: "Ask about her art", reaction: "\"You care about creation. That matters.\"" },
-                            { text: "Share your own story", reaction: "\"Every cook is an artist too.\"" },
-                            { text: "Stay mysterious", reaction: "\"Hmm... silence says more than words.\"" }
-                        ]
-                    },
-                    {
-                        prompt: "How will you present the taco?",
-                        choices: [
-                            { text: "Geometric arrangement", reaction: "\"Symmetry is satisfying.\"" },
-                            { text: "Organic messy plate", reaction: "\"Imperfection is emotion.\"" },
-                            { text: "Taco tower", reaction: "\"Absurd, but amazing!\"" }
-                        ]
-                    }
-                ]
-            }
-        ];
-
-        // ============================================
-        // SCENE TRANSITION
-        // ============================================
-        function showScene(sceneId) {
-            const scenes = document.querySelectorAll('.scene');
-            scenes.forEach(scene => {
-                scene.classList.remove('active');
-            });
-
-            setTimeout(() => {
-                document.getElementById(sceneId).classList.add('active');
-            }, 500);
-        }
-
-        // ============================================
-        // TYPING EFFECT
-        // ============================================
-        function typeText(element, text, speed = 30) {
-            return new Promise((resolve) => {
-                element.innerHTML = '';
-                let index = 0;
-
-                const cursor = document.createElement('span');
-                cursor.className = 'typing-cursor';
-                element.appendChild(cursor);
-
-                const interval = setInterval(() => {
-                    if (index < text.length) {
-                        cursor.remove();
-                        element.innerHTML += text.charAt(index);
-                        element.appendChild(cursor);
-                        index++;
-                    } else {
-                        cursor.remove();
-                        clearInterval(interval);
-                        resolve();
-                    }
-                }, speed);
-            });
-        }
-
-        // ============================================
-        // GAME FLOW
-        // ============================================
-        function startGame() {
-            gameState.currentCustomer = 0;
-            gameState.currentRound = 0;
-            gameState.customerChoices = [];
-            showScene('customer-scene');
-            setTimeout(() => {
-                startCustomerInteraction();
-            }, 1000);
-        }
-
-        function startCustomerInteraction() {
-            const customer = customers[gameState.currentCustomer];
-            const customerProgress = document.getElementById('customer-progress');
-            const customerAvatar = document.getElementById('customer-avatar');
-            const dialogueText = document.getElementById('dialogue-text');
-            const choicesContainer = document.getElementById('choices-container');
-
-            customerProgress.textContent = `Customer ${gameState.currentCustomer + 1} of 3`;
-            customerAvatar.textContent = customer.avatar;
-            choicesContainer.innerHTML = '';
-
-            if (gameState.currentRound === 0) {
-                typeText(dialogueText, customer.intro).then(() => {
-                    setTimeout(() => {
-                        showChoices();
-                    }, 500);
-                });
-            } else {
-                showChoices();
-            }
-        }
-
-        function showChoices() {
-            const customer = customers[gameState.currentCustomer];
-            const round = customer.rounds[gameState.currentRound];
-            const dialogueText = document.getElementById('dialogue-text');
-            const choicesContainer = document.getElementById('choices-container');
-
-            typeText(dialogueText, round.prompt).then(() => {
-                choicesContainer.innerHTML = '';
-                round.choices.forEach((choice, index) => {
-                    const button = document.createElement('button');
-                    button.className = 'choice-btn';
-                    button.textContent = choice.text;
-                    button.onclick = () => selectChoice(index);
-                    choicesContainer.appendChild(button);
-                });
-            });
-        }
-
-        function selectChoice(choiceIndex) {
-            const customer = customers[gameState.currentCustomer];
-            const round = customer.rounds[gameState.currentRound];
-            const choice = round.choices[choiceIndex];
-            const dialogueText = document.getElementById('dialogue-text');
-            const choicesContainer = document.getElementById('choices-container');
-
-            // Disable all choices
-            const buttons = choicesContainer.querySelectorAll('.choice-btn');
-            buttons.forEach(btn => btn.disabled = true);
-
-            // Store choice
-            gameState.customerChoices.push(choiceIndex);
-
-            // Show reaction
-            typeText(dialogueText, choice.reaction).then(() => {
-                setTimeout(() => {
-                    gameState.currentRound++;
-
-                    if (gameState.currentRound >= customer.rounds.length) {
-                        // Move to next customer
-                        gameState.currentRound = 0;
-                        gameState.currentCustomer++;
-
-                        if (gameState.currentCustomer >= customers.length) {
-                            // All customers done, go to cooking
-                            setTimeout(() => {
-                                showScene('cooking-scene');
-                                initCooking();
-                            }, 1500);
-                        } else {
-                            setTimeout(() => {
-                                startCustomerInteraction();
-                            }, 1500);
-                        }
-                    } else {
-                        setTimeout(() => {
-                            showChoices();
-                        }, 1000);
-                    }
-                }, 2000);
-            });
-        }
-
-        // ============================================
-        // COOKING INTERACTION
-        // ============================================
-        function initCooking() {
-            const ingredients = document.querySelectorAll('.ingredient');
-            const panArea = document.getElementById('pan-area');
-
-            ingredients.forEach(ingredient => {
-                ingredient.addEventListener('dragstart', handleDragStart);
-                ingredient.addEventListener('dragend', handleDragEnd);
-            });
-
-            panArea.addEventListener('dragover', handleDragOver);
-            panArea.addEventListener('dragleave', handleDragLeave);
-            panArea.addEventListener('drop', handleDrop);
-        }
-
-        let draggedElement = null;
-
-        function handleDragStart(e) {
-            draggedElement = e.target;
-            e.target.style.opacity = '0.5';
-        }
-
-        function handleDragEnd(e) {
-            e.target.style.opacity = '1';
-        }
-
-        function handleDragOver(e) {
-            e.preventDefault();
-            document.getElementById('pan-area').classList.add('drag-over');
-        }
-
-        function handleDragLeave(e) {
-            document.getElementById('pan-area').classList.remove('drag-over');
-        }
-
-        function handleDrop(e) {
-            e.preventDefault();
-            const panArea = document.getElementById('pan-area');
-            panArea.classList.remove('drag-over');
-
-            if (draggedElement && gameState.addedIngredients.length < 3) {
-                const ingredientName = draggedElement.getAttribute('data-ingredient');
-                const ingredientIcon = draggedElement.querySelector('.ingredient-icon').textContent;
-
-                // Add to pan
-                addIngredientToPan(ingredientIcon);
-                gameState.addedIngredients.push(ingredientName);
-
-                // Remove from shelf
-                draggedElement.style.display = 'none';
-
-                // Show sizzle effect
-                showSizzleEffect();
-
-                // Check if done
-                if (gameState.addedIngredients.length >= 3) {
-                    setTimeout(() => {
-                        showCookingComplete();
-                    }, 1000);
-                }
-            }
-        }
-
-        function addIngredientToPan(icon) {
-            const panContents = document.getElementById('pan-contents');
-            const panText = document.querySelector('.pan-text');
-            const panIcon = document.querySelector('.pan-icon');
-
-            if (gameState.addedIngredients.length === 0) {
-                panText.style.display = 'none';
-                panIcon.style.display = 'none';
-            }
-
-            const ingredientDiv = document.createElement('div');
-            ingredientDiv.className = 'pan-ingredient';
-            ingredientDiv.textContent = icon;
-            panContents.appendChild(ingredientDiv);
-        }
-
-        function showSizzleEffect() {
-            const panArea = document.getElementById('pan-area');
-            const smoke = document.createElement('div');
-            smoke.className = 'smoke';
-            smoke.textContent = '💨';
-            smoke.style.left = `${Math.random() * 200 + 75}px`;
-            smoke.style.top = `${Math.random() * 100 + 100}px`;
-            panArea.appendChild(smoke);
-
-            setTimeout(() => {
-                smoke.remove();
-            }, 2000);
-        }
-
-        function showCookingComplete() {
-            const panText = document.querySelector('.pan-text');
-            panText.style.display = 'block';
-            panText.textContent = "You've made your own unique flavor!";
-            panText.style.fontSize = '1.5rem';
-            panText.style.color = '#fdc830';
-            panText.style.fontWeight = 'bold';
-
-            document.getElementById('finish-cooking-btn').classList.remove('hidden');
-        }
-
-        function showOutcome() {
-            showScene('outcome-scene');
-        }
-
-        function restartGame() {
-            // Reset game state
-            gameState.currentCustomer = 0;
-            gameState.currentRound = 0;
-            gameState.customerChoices = [];
-            gameState.addedIngredients = [];
-
-            // Reset cooking scene
-            const panContents = document.getElementById('pan-contents');
-            panContents.innerHTML = '';
-
-            const panText = document.querySelector('.pan-text');
-            panText.style.display = 'block';
-            panText.textContent = 'Drop ingredients here';
-            panText.style.fontSize = '1.2rem';
-            panText.style.color = '#fff';
-            panText.style.fontWeight = 'normal';
-
-            const panIcon = document.querySelector('.pan-icon');
-            panIcon.style.display = 'block';
-
-            document.getElementById('finish-cooking-btn').classList.add('hidden');
-
-            // Reset ingredients
-            const ingredients = document.querySelectorAll('.ingredient');
-            ingredients.forEach(ingredient => {
-                ingredient.style.display = 'flex';
-            });
-
-            // Go back to intro
-            showScene('intro');
-        }
-
-        // ============================================
-        // INITIALIZATION
-        // ============================================
-        window.addEventListener('load', () => {
-            console.log('The Taste of Choice - Game Loaded');
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
