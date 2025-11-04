@@ -3,1022 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Taste of Choice - Interactive Story</title>
-    <style>
-        /* ===================================
-           GLOBAL STYLES & RESET
-           =================================== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Georgia', 'Times New Roman', serif;
-            background: linear-gradient(135deg, #2c1810 0%, #4a2c1f 50%, #1a0f08 100%);
-            color: #f5e6d3;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            overflow-x: hidden;
-        }
-
-        /* ===================================
-           NIGHT MARKET ATMOSPHERE
-           =================================== */
-        /* Animated background stars/lights effect */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image:
-                radial-gradient(2px 2px at 20% 30%, #ffd700, transparent),
-                radial-gradient(2px 2px at 60% 70%, #ff8c42, transparent),
-                radial-gradient(1px 1px at 50% 50%, #fff, transparent),
-                radial-gradient(1px 1px at 80% 10%, #ffa500, transparent),
-                radial-gradient(2px 2px at 90% 60%, #ff6b35, transparent),
-                radial-gradient(1px 1px at 33% 80%, #ffeb3b, transparent);
-            background-size: 300% 300%;
-            animation: twinkle 8s ease-in-out infinite;
-            opacity: 0.3;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.2; }
-            50% { opacity: 0.4; }
-        }
-
-        /* ===================================
-           MAIN CONTAINER
-           =================================== */
-        .container {
-            position: relative;
-            z-index: 1;
-            max-width: 800px;
-            width: 100%;
-            background: rgba(60, 35, 25, 0.9);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6),
-                        inset 0 1px 0 rgba(255, 200, 150, 0.1);
-            border: 2px solid rgba(255, 140, 66, 0.3);
-            backdrop-filter: blur(10px);
-        }
-
-        /* ===================================
-           HEADER / TITLE
-           =================================== */
-        .title {
-            text-align: center;
-            font-size: 2.5em;
-            color: #ff8c42;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5),
-                         0 0 20px rgba(255, 140, 66, 0.3);
-            font-weight: bold;
-        }
-
-        .subtitle {
-            text-align: center;
-            font-size: 1.1em;
-            color: #d4a574;
-            margin-bottom: 30px;
-            font-style: italic;
-        }
-
-        /* ===================================
-           CUSTOMER PORTRAIT AREA
-           =================================== */
-        .customer-portrait {
-            width: 150px;
-            height: 150px;
-            margin: 0 auto 30px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 48px;
-            font-weight: bold;
-            color: #fff;
-            background: linear-gradient(135deg, #ff8c42, #ff6b35);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4),
-                        inset 0 -5px 10px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
-            border: 4px solid rgba(255, 200, 150, 0.3);
-        }
-
-        .customer-portrait:hover {
-            transform: scale(1.05);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
-        }
-
-        /* ===================================
-           NARRATIVE TEXT AREA
-           =================================== */
-        .narrative {
-            text-align: center;
-            font-size: 1.2em;
-            line-height: 1.8;
-            margin-bottom: 30px;
-            min-height: 120px;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-            border-left: 4px solid #ff8c42;
-            color: #f5e6d3;
-        }
-
-        .narrative strong {
-            color: #ffa500;
-        }
-
-        /* ===================================
-           CHOICE STAGE INDICATOR
-           =================================== */
-        .choice-stage {
-            text-align: center;
-            font-size: 1.3em;
-            color: #ffd700;
-            margin-bottom: 20px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        /* ===================================
-           CHOICE BUTTONS CONTAINER
-           =================================== */
-        .choices {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .choice-btn {
-            padding: 20px 30px;
-            font-size: 1.1em;
-            background: linear-gradient(135deg, #8b4513, #a0522d);
-            color: #fff;
-            border: 2px solid #d2691e;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            font-family: 'Georgia', serif;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Button hover effect with light sweep */
-        .choice-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .choice-btn:hover::before {
-            left: 100%;
-        }
-
-        .choice-btn:hover {
-            background: linear-gradient(135deg, #a0522d, #cd853f);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(255, 140, 66, 0.4);
-            border-color: #ff8c42;
-        }
-
-        .choice-btn:active {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        /* ===================================
-           FEEDBACK MESSAGE AREA
-           =================================== */
-        .feedback {
-            text-align: center;
-            font-size: 1.1em;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            min-height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transform: translateY(-10px);
-            transition: all 0.4s ease;
-            background: rgba(255, 140, 66, 0.15);
-            border: 2px solid transparent;
-        }
-
-        .feedback.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Different feedback emotion styles */
-        .feedback.positive {
-            background: rgba(76, 175, 80, 0.2);
-            border-color: #4caf50;
-            color: #a5d6a7;
-        }
-
-        .feedback.neutral {
-            background: rgba(255, 193, 7, 0.2);
-            border-color: #ffc107;
-            color: #ffd54f;
-        }
-
-        .feedback.curious {
-            background: rgba(33, 150, 243, 0.2);
-            border-color: #2196f3;
-            color: #90caf9;
-        }
-
-        /* ===================================
-           RESTART BUTTON
-           =================================== */
-        .restart-btn {
-            display: block;
-            margin: 30px auto 0;
-            padding: 15px 40px;
-            font-size: 1.1em;
-            background: linear-gradient(135deg, #ff6b35, #ff8c42);
-            color: #fff;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 20px rgba(255, 107, 53, 0.4);
-            font-family: 'Georgia', serif;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .restart-btn:hover {
-            background: linear-gradient(135deg, #ff8c42, #ffa500);
-            transform: scale(1.05);
-            box-shadow: 0 8px 25px rgba(255, 140, 66, 0.6);
-        }
-
-        .restart-btn:active {
-            transform: scale(0.98);
-        }
-
-        /* ===================================
-           UTILITY CLASSES
-           =================================== */
-        .hidden {
-            display: none !important;
-        }
-
-        /* Fade-in animation for new content */
-        .fade-in {
-            animation: fadeIn 0.6s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* ===================================
-           PROGRESS TRACKER
-           =================================== */
-        .progress-tracker {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .progress-dot {
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .progress-dot.active {
-            background: #ff8c42;
-            box-shadow: 0 0 10px #ff8c42;
-        }
-
-        .progress-dot.completed {
-            background: #4caf50;
-        }
-
-        /* ===================================
-           FINAL OUTCOME CARD
-           =================================== */
-        .outcome-card {
-            background: linear-gradient(135deg, rgba(255, 140, 66, 0.2), rgba(255, 107, 53, 0.2));
-            padding: 30px;
-            border-radius: 15px;
-            border: 2px solid #ff8c42;
-            margin-top: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .outcome-title {
-            font-size: 1.5em;
-            color: #ffd700;
-            text-align: center;
-            margin-bottom: 15px;
-            font-weight: bold;
-        }
-
-        .outcome-description {
-            font-size: 1.1em;
-            line-height: 1.8;
-            color: #f5e6d3;
-            text-align: center;
-        }
-
-        /* ===================================
-           RESPONSIVE DESIGN
-           =================================== */
-        @media (max-width: 600px) {
-            .container {
-                padding: 25px;
-            }
-
-            .title {
-                font-size: 2em;
-            }
-
-            .narrative {
-                font-size: 1em;
-                min-height: 100px;
-            }
-
-            .choice-btn {
-                padding: 15px 20px;
-                font-size: 1em;
-            }
-
-            .customer-portrait {
-                width: 120px;
-                height: 120px;
-                font-size: 60px;
-            }
-        }
-    </style>
+    <title>The Taste of Taco - Interactive Night Market Experience</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Main Container -->
-    <div class="container">
-        <!-- Title Section -->
-        <h1 class="title">The Taste of Choice</h1>
-        <p class="subtitle">A Night Market Story</p>
-
-        <!-- Progress Tracker -->
-        <div class="progress-tracker" id="progressTracker">
-            <div class="progress-dot"></div>
-            <div class="progress-dot"></div>
-            <div class="progress-dot"></div>
+    <!-- ===================================
+         SCENE 1: INTRO SCENE
+         =================================== -->
+    <div id="intro-scene" class="scene active">
+        <div class="container">
+            <div class="night-market-bg"></div>
+            <h1 class="main-title">The Taste of Taco</h1>
+            <p class="main-subtitle">Every flavor tells a story.</p>
+            <p class="intro-text">
+                The night market glows with warm lights. The air is thick with the aroma of spices,
+                grilled meat, and anticipation. You stand behind your taco stand, ready to serve
+                those who wander into the evening seeking comfort, adventure, or connection.
+            </p>
+            <button class="start-btn" onclick="startGame()">Start Your Taco Stand</button>
         </div>
-
-        <!-- Customer Portrait -->
-        <div class="customer-portrait" id="customerPortrait">
-            ?
-        </div>
-
-        <!-- Choice Stage Indicator -->
-        <div class="choice-stage" id="choiceStage">
-            Welcome
-        </div>
-
-        <!-- Narrative Text Area -->
-        <div class="narrative" id="narrative">
-            The night market hums with life. Steam rises from food stalls, mixing with laughter and music.
-            You stand behind your taco cart, ready to serve. Your first customer approaches...
-        </div>
-
-        <!-- Feedback Message Area -->
-        <div class="feedback" id="feedback"></div>
-
-        <!-- Choice Buttons Container -->
-        <div class="choices" id="choices">
-            <button class="choice-btn" onclick="startStory()">Begin Your Shift</button>
-        </div>
-
-        <!-- Restart Button (hidden initially) -->
-        <button class="restart-btn hidden" id="restartBtn" onclick="restartStory()">
-            Start New Shift
-        </button>
     </div>
 
-    <script>
-        /* ===================================
-           STORY DATA STRUCTURE
-           =================================== */
+    <!-- ===================================
+         SCENE 2: CUSTOMER SCENES
+         =================================== -->
+    <div id="customer-scene" class="scene">
+        <div class="container">
+            <!-- Customer portrait -->
+            <div class="customer-portrait" id="customerPortrait"></div>
 
-        // Story state management
-        const storyState = {
-            currentCustomer: 0,
-            currentStage: 0,
-            choices: [],
-            customerData: []
-        };
+            <!-- Progress indicator -->
+            <div class="progress-bar">
+                <div class="progress-dot" data-round="1"></div>
+                <div class="progress-dot" data-round="2"></div>
+                <div class="progress-dot" data-round="3"></div>
+            </div>
 
-        // Customer definitions with narrative branches
-        const customers = [
-            {
-                name: "Office Worker",
-                initials: "OW",
-                portraitColor: "linear-gradient(135deg, #5c7cba, #3d5a8c)",
-                description: "A tired office worker approaches, loosening their tie. The weight of a long day shows in their eyes.",
-                backgroundColor: "#2c4a6e",
-                stages: [
-                    {
-                        type: "ingredients",
-                        title: "Choose the Ingredients",
-                        prompt: "They look at your menu thoughtfully. What ingredients will you offer?",
-                        choices: [
-                            {
-                                label: "Traditional - Carne asada, cilantro, onions",
-                                feedback: "They nod approvingly. 'Just like the ones from my hometown.'",
-                                emotion: "positive",
-                                trait: "nostalgic"
-                            },
-                            {
-                                label: "Creative - Grilled pineapple, chipotle sauce, avocado",
-                                feedback: "Their eyebrows raise with interest. 'That's... different. I like it.'",
-                                emotion: "curious",
-                                trait: "adventurous"
-                            },
-                            {
-                                label: "Fusion - Korean BBQ beef, kimchi, sesame",
-                                feedback: "A surprised smile. 'I didn't expect this at a taco stand!'",
-                                emotion: "curious",
-                                trait: "surprised"
-                            }
-                        ]
-                    },
-                    {
-                        type: "communication",
-                        title: "Choose Your Approach",
-                        prompt: "As you prepare, how do you engage with them?",
-                        choices: [
-                            {
-                                label: "Friendly - Share a story about your day",
-                                feedback: "They laugh genuinely. 'Thanks, I needed that lightness.'",
-                                emotion: "positive",
-                                trait: "warm"
-                            },
-                            {
-                                label: "Quiet - Work in peaceful silence",
-                                feedback: "They seem grateful for the calm. A peaceful moment shared.",
-                                emotion: "neutral",
-                                trait: "respectful"
-                            },
-                            {
-                                label: "Curious - Ask about their day",
-                                feedback: "'Long, but getting better now.' They appreciate being heard.",
-                                emotion: "positive",
-                                trait: "caring"
-                            }
-                        ]
-                    },
-                    {
-                        type: "presentation",
-                        title: "Choose the Presentation",
-                        prompt: "Time to plate. How will you present their taco?",
-                        choices: [
-                            {
-                                label: "Simple - Classic street style, wrapped in paper",
-                                feedback: "They smile. 'Perfect. Simple and honest.'",
-                                emotion: "positive",
-                                trait: "authentic"
-                            },
-                            {
-                                label: "Artistic - Garnished with lime and radish flowers",
-                                feedback: "They pause to admire it. 'It's almost too beautiful to eat... almost.'",
-                                emotion: "curious",
-                                trait: "appreciative"
-                            },
-                            {
-                                label: "Rich - Extra toppings and two sauces on the side",
-                                feedback: "'You're generous. This will hit the spot perfectly.'",
-                                emotion: "positive",
-                                trait: "satisfied"
-                            }
-                        ]
-                    }
-                ],
-                outcomes: {
-                    nostalgic_warm_authentic: "They take a bite and close their eyes. 'This... this tastes like home. Like my grandmother's kitchen. Thank you.' A genuine smile spreads across their tired face.",
-                    nostalgic_respectful_authentic: "In comfortable silence, they savor each bite. Before leaving, they nod with deep appreciation. 'Best decision I made today.'",
-                    adventurous_caring_appreciative: "They laugh between bites. 'I came here exhausted, but you've reminded me why I love this city. The unexpected magic in simple moments.'",
-                    surprised_warm_rich: "Their eyes light up with each flavor. 'You know, I almost went straight home. So glad I stopped here. This is exactly what I needed.'",
-                    default: "They finish the taco with satisfaction. 'That was really good. I'll remember this place.' They leave with a lighter step than when they arrived."
-                }
-            },
-            {
-                name: "Street Artist",
-                initials: "SA",
-                portraitColor: "linear-gradient(135deg, #e91e63, #9c27b0)",
-                description: "A paint-splattered artist bounces up to your cart, vibrant and energetic despite the late hour.",
-                backgroundColor: "#4a1f4a",
-                stages: [
-                    {
-                        type: "ingredients",
-                        title: "Choose the Ingredients",
-                        prompt: "They lean in excitedly. 'Surprise me! What's your masterpiece?'",
-                        choices: [
-                            {
-                                label: "Traditional - Slow-cooked carnitas, fresh salsa",
-                                feedback: "'Classic! There's beauty in tradition, you know?'",
-                                emotion: "positive",
-                                trait: "grounded"
-                            },
-                            {
-                                label: "Creative - Mango salsa, jalapeño, cilantro lime",
-                                feedback: "'YES! Now we're talking! Colors and flavors!'",
-                                emotion: "positive",
-                                trait: "vibrant"
-                            },
-                            {
-                                label: "Fusion - Teriyaki chicken, wasabi cream, pickled ginger",
-                                feedback: "'Whoa! That's like... culinary graffiti! I love it!'",
-                                emotion: "positive",
-                                trait: "bold"
-                            }
-                        ]
-                    },
-                    {
-                        type: "communication",
-                        title: "Choose Your Approach",
-                        prompt: "They're drumming their fingers on the counter. Your move?",
-                        choices: [
-                            {
-                                label: "Friendly - Match their energy with enthusiasm",
-                                feedback: "'You get it! Food is art, art is food!' They beam at you.",
-                                emotion: "positive",
-                                trait: "connected"
-                            },
-                            {
-                                label: "Quiet - Let your cooking do the talking",
-                                feedback: "They watch your hands work. 'I see... the performance in the process.'",
-                                emotion: "curious",
-                                trait: "observant"
-                            },
-                            {
-                                label: "Curious - Ask about their latest project",
-                                feedback: "Their eyes light up as they describe a new mural. 'It's about connection!'",
-                                emotion: "positive",
-                                trait: "inspired"
-                            }
-                        ]
-                    },
-                    {
-                        type: "presentation",
-                        title: "Choose the Presentation",
-                        prompt: "For an artist, presentation is everything. How do you serve?",
-                        choices: [
-                            {
-                                label: "Simple - Clean and minimalist",
-                                feedback: "'Minimalism... letting the essence speak. Respect.'",
-                                emotion: "neutral",
-                                trait: "refined"
-                            },
-                            {
-                                label: "Artistic - Sauce drizzle pattern, colorful garnish",
-                                feedback: "'NOW you're speaking my language! Look at those lines!'",
-                                emotion: "positive",
-                                trait: "delighted"
-                            },
-                            {
-                                label: "Rich - Abundance of everything, overflowing",
-                                feedback: "'Maximalism! Living LOUD! This is a whole experience!'",
-                                emotion: "positive",
-                                trait: "exuberant"
-                            }
-                        ]
-                    }
-                ],
-                outcomes: {
-                    vibrant_connected_delighted: "They take a photo, then a bite. 'This is PERFECT! You're an artist too, you know that? Can I paint your cart sometime?' Pure joy radiates from them.",
-                    bold_inspired_exuberant: "'THIS! This is what I'm trying to capture in my work - unexpected fusion, breaking boundaries!' They eat with theatrical appreciation.",
-                    grounded_observant_refined: "They eat thoughtfully, savoring each component. 'You know what? Sometimes the traditional foundation lets you really taste the craft. Beautiful work.'",
-                    vibrant_curious_delighted: "Between bites, they sketch on a napkin. 'You've inspired me. Look - I'm designing a piece about flavor and color.' They show you a quick drawing of your taco stand.",
-                    default: "They finish with a flourish, leaving colorful paint smudges on the napkin. 'You made my night! Art comes in all forms!' They leave a generous tip and dance away."
-                }
-            },
-            {
-                name: "Elderly Grandmother",
-                initials: "EG",
-                portraitColor: "linear-gradient(135deg, #d4a574, #a0826d)",
-                description: "An elderly woman with kind eyes and a gentle smile approaches slowly, supporting herself with a cane.",
-                backgroundColor: "#3a2a1a",
-                stages: [
-                    {
-                        type: "ingredients",
-                        title: "Choose the Ingredients",
-                        prompt: "She speaks softly. 'What would you recommend, dear?'",
-                        choices: [
-                            {
-                                label: "Traditional - Tender barbacoa, classic preparation",
-                                feedback: "'Ah, yes. Just how I remember making them...' Her eyes grow distant, remembering.",
-                                emotion: "positive",
-                                trait: "nostalgic"
-                            },
-                            {
-                                label: "Creative - Roasted vegetables, herb blend",
-                                feedback: "'How lovely! You young people always find new ways.' She seems pleased.",
-                                emotion: "positive",
-                                trait: "open"
-                            },
-                            {
-                                label: "Fusion - Mild curry spiced chicken, yogurt sauce",
-                                feedback: "'Oh my! That sounds adventurous. Why not? I'm not too old to try new things!'",
-                                emotion: "curious",
-                                trait: "brave"
-                            }
-                        ]
-                    },
-                    {
-                        type: "communication",
-                        title: "Choose Your Approach",
-                        prompt: "She settles onto the nearby bench. How do you connect?",
-                        choices: [
-                            {
-                                label: "Friendly - Share warmth and casual chat",
-                                feedback: "'You remind me of my grandchild. The same kindness.' She pats your hand.",
-                                emotion: "positive",
-                                trait: "touched"
-                            },
-                            {
-                                label: "Quiet - Respectful, gentle presence",
-                                feedback: "She watches you work with a peaceful expression. Comfortable silence fills the space.",
-                                emotion: "neutral",
-                                trait: "peaceful"
-                            },
-                            {
-                                label: "Curious - Listen to her stories",
-                                feedback: "She tells you about running her own food cart years ago. 'Those were good days...'",
-                                emotion: "positive",
-                                trait: "connected"
-                            }
-                        ]
-                    },
-                    {
-                        type: "presentation",
-                        title: "Choose the Presentation",
-                        prompt: "You notice she has difficulty holding things. How do you serve?",
-                        choices: [
-                            {
-                                label: "Simple - Easy to hold, wrapped securely",
-                                feedback: "'Thank you, dear. You're very thoughtful.' She holds it easily.",
-                                emotion: "positive",
-                                trait: "grateful"
-                            },
-                            {
-                                label: "Artistic - Beautiful but perhaps delicate",
-                                feedback: "She admires it carefully. 'So pretty... you have an artist's touch.'",
-                                emotion: "curious",
-                                trait: "admiring"
-                            },
-                            {
-                                label: "Rich - Cut in half, served on a plate with fork",
-                                feedback: "'Oh, how considerate! You noticed...' Tears glisten in her eyes. 'Bless you.'",
-                                emotion: "positive",
-                                trait: "deeply_moved"
-                            }
-                        ]
-                    }
-                ],
-                outcomes: {
-                    nostalgic_touched_grateful: "She takes a small bite and closes her eyes. A tear rolls down her cheek. 'This tastes just like the ones I used to make for my family. You've given me a precious gift tonight - a memory I thought I'd lost.' She holds your hand warmly.",
-                    nostalgic_connected_deeply_moved: "As she eats, she tells you about her late husband. 'He would have loved this. You know, I ran a taco stand with him for forty years. You remind me of why we did it - to bring a moment of joy to others.' She thanks you with genuine emotion.",
-                    open_touched_grateful: "She savors each bite slowly. 'You know what I love about this? It's new, but made with the same heart I put into my cooking. The world changes, but kindness doesn't.' She smiles warmly at you.",
-                    brave_peaceful_admiring: "'At my age, every new experience is a treasure.' She eats contentedly. 'Thank you for treating me not as fragile, but as someone still living.' She nods with deep respect.",
-                    default: "She finishes her meal with satisfaction. 'You have a gift, young one. You're not just feeding people - you're caring for them. Don't lose that.' She leaves with a gentle blessing and a warm smile."
-                }
-            }
-        ];
+            <!-- Dialogue box with typing effect -->
+            <div class="dialogue-box" id="dialogueBox">
+                <p class="dialogue-text" id="dialogueText"></p>
+            </div>
 
-        /* ===================================
-           STORY PROGRESSION FUNCTIONS
-           =================================== */
+            <!-- Choice buttons -->
+            <div class="choices-container" id="choicesContainer"></div>
 
-        /**
-         * Initialize and start the story
-         */
-        function startStory() {
-            storyState.currentCustomer = 0;
-            storyState.currentStage = 0;
-            storyState.choices = [];
-            storyState.customerData = [];
+            <!-- Reaction text -->
+            <div class="reaction-box" id="reactionBox"></div>
+        </div>
+    </div>
 
-            document.getElementById('restartBtn').classList.add('hidden');
-            showCustomer();
-        }
+    <!-- ===================================
+         SCENE 3: COOKING INTERACTION
+         =================================== -->
+    <div id="cooking-scene" class="scene">
+        <div class="container">
+            <h2 class="scene-title">Make Your Own Taco</h2>
+            <p class="scene-subtitle">Drag ingredients into the pan to create your unique flavor</p>
 
-        /**
-         * Display current customer and their first stage
-         */
-        function showCustomer() {
-            const customer = customers[storyState.currentCustomer];
-            const stage = customer.stages[storyState.currentStage];
+            <!-- Cooking pan area (drop zone) -->
+            <div class="cooking-pan" id="cookingPan">
+                <div class="pan-glow"></div>
+                <div class="smoke-container" id="smokeContainer"></div>
+                <div class="ingredient-display" id="ingredientDisplay"></div>
+            </div>
 
-            // Update progress tracker
-            updateProgressTracker();
-
-            // Change background color for atmosphere
-            document.body.style.background = `linear-gradient(135deg, ${customer.backgroundColor} 0%, #2c1810 50%, #1a0f08 100%)`;
-
-            // Update customer portrait
-            const portraitEl = document.getElementById('customerPortrait');
-            portraitEl.textContent = customer.initials;
-            portraitEl.style.background = customer.portraitColor;
-            portraitEl.classList.add('fade-in');
-
-            // Update stage title
-            document.getElementById('choiceStage').textContent = stage.title;
-
-            // Show customer description (first stage only)
-            const narrativeText = storyState.currentStage === 0
-                ? `${customer.description}\n\n${stage.prompt}`
-                : stage.prompt;
-
-            document.getElementById('narrative').textContent = narrativeText;
-
-            // Clear feedback
-            const feedbackEl = document.getElementById('feedback');
-            feedbackEl.classList.remove('show', 'positive', 'neutral', 'curious');
-            feedbackEl.textContent = '';
-
-            // Render choice buttons
-            renderChoices(stage.choices);
-        }
-
-        /**
-         * Render choice buttons for current stage
-         */
-        function renderChoices(choices) {
-            const choicesContainer = document.getElementById('choices');
-            choicesContainer.innerHTML = '';
-
-            choices.forEach((choice, index) => {
-                const button = document.createElement('button');
-                button.className = 'choice-btn fade-in';
-                button.textContent = choice.label;
-                button.style.animationDelay = `${index * 0.1}s`;
-                button.onclick = () => makeChoice(choice);
-                choicesContainer.appendChild(button);
-            });
-        }
-
-        /**
-         * Handle player choice selection
-         */
-        function makeChoice(choice) {
-            // Store the choice
-            storyState.choices.push(choice.trait);
-
-            // Show feedback
-            showFeedback(choice.feedback, choice.emotion);
-
-            // Hide choices temporarily
-            document.getElementById('choices').innerHTML = '';
-
-            // Wait for feedback, then proceed
-            setTimeout(() => {
-                if (storyState.currentStage < 2) {
-                    // Move to next stage with same customer
-                    storyState.currentStage++;
-                    showCustomer();
-                } else {
-                    // Customer complete, show outcome
-                    showCustomerOutcome();
-                }
-            }, 2500);
-        }
-
-        /**
-         * Display feedback message after choice
-         */
-        function showFeedback(message, emotion) {
-            const feedbackEl = document.getElementById('feedback');
-            feedbackEl.textContent = message;
-            feedbackEl.className = `feedback show ${emotion}`;
-        }
-
-        /**
-         * Show outcome for completed customer interaction
-         */
-        function showCustomerOutcome() {
-            const customer = customers[storyState.currentCustomer];
-
-            // Try to find specific outcome based on choice combination
-            const outcomeKey = storyState.choices.join('_');
-            const outcomeMessage = customer.outcomes[outcomeKey] || customer.outcomes.default;
-
-            // Store customer data
-            storyState.customerData.push({
-                name: customer.name,
-                initials: customer.initials,
-                choices: [...storyState.choices],
-                outcome: outcomeMessage
-            });
-
-            // Display outcome
-            const narrativeEl = document.getElementById('narrative');
-            narrativeEl.innerHTML = `
-                <div class="outcome-card fade-in">
-                    <div class="outcome-title">${customer.name}'s Story</div>
-                    <div class="outcome-description">${outcomeMessage}</div>
+            <!-- Ingredients area (drag sources) -->
+            <div class="ingredients-shelf">
+                <div class="ingredient" draggable="true" data-ingredient="beef">
+                    <div class="ingredient-icon">🥩</div>
+                    <div class="ingredient-name">Beef</div>
                 </div>
-            `;
-
-            // Clear feedback
-            const feedbackEl = document.getElementById('feedback');
-            feedbackEl.classList.remove('show');
-
-            // Update progress
-            updateProgressTracker(true);
-
-            // Show next button or final summary
-            const choicesContainer = document.getElementById('choices');
-            choicesContainer.innerHTML = '';
-
-            setTimeout(() => {
-                if (storyState.currentCustomer < customers.length - 1) {
-                    // More customers to serve
-                    const nextBtn = document.createElement('button');
-                    nextBtn.className = 'choice-btn fade-in';
-                    nextBtn.textContent = 'Next Customer';
-                    nextBtn.onclick = nextCustomer;
-                    choicesContainer.appendChild(nextBtn);
-                } else {
-                    // All customers served - show final summary
-                    showFinalSummary();
-                }
-            }, 1000);
-        }
-
-        /**
-         * Move to next customer
-         */
-        function nextCustomer() {
-            storyState.currentCustomer++;
-            storyState.currentStage = 0;
-            storyState.choices = [];
-            showCustomer();
-        }
-
-        /**
-         * Show final summary of all interactions
-         */
-        function showFinalSummary() {
-            document.getElementById('choiceStage').textContent = 'Night Market Memories';
-
-            let summaryHTML = `
-                <div class="outcome-card fade-in">
-                    <div class="outcome-title">Your Night at the Market</div>
-                    <div class="outcome-description" style="text-align: left; padding: 20px 0;">
-                        <p style="text-align: center; margin-bottom: 20px; font-style: italic;">
-                            Three souls came to your cart tonight. Three stories shared over tacos.
-                        </p>
-            `;
-
-            storyState.customerData.forEach((data, index) => {
-                summaryHTML += `
-                    <p style="margin: 15px 0; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px;">
-                        <strong style="color: #ffd700;">${data.name}:</strong><br>
-                        <span style="color: #f5e6d3; font-size: 0.95em;">${data.outcome}</span>
-                    </p>
-                `;
-            });
-
-            summaryHTML += `
-                    <p style="text-align: center; margin-top: 25px; font-size: 1.1em; color: #ff8c42;">
-                        This is the beauty of the night market - every choice, every moment of care,
-                        creates a story that lingers long after the food is gone.
-                    </p>
-                    <p style="text-align: center; margin-top: 15px; font-style: italic; color: #d4a574;">
-                        Thank you for bringing warmth to the night.
-                    </p>
-                    </div>
+                <div class="ingredient" draggable="true" data-ingredient="chicken">
+                    <div class="ingredient-icon">🍗</div>
+                    <div class="ingredient-name">Chicken</div>
                 </div>
-            `;
+                <div class="ingredient" draggable="true" data-ingredient="salsa">
+                    <div class="ingredient-icon">🍅</div>
+                    <div class="ingredient-name">Salsa</div>
+                </div>
+                <div class="ingredient" draggable="true" data-ingredient="avocado">
+                    <div class="ingredient-icon">🥑</div>
+                    <div class="ingredient-name">Avocado</div>
+                </div>
+                <div class="ingredient" draggable="true" data-ingredient="cheese">
+                    <div class="ingredient-icon">🧀</div>
+                    <div class="ingredient-name">Cheese</div>
+                </div>
+                <div class="ingredient" draggable="true" data-ingredient="lettuce">
+                    <div class="ingredient-icon">🥬</div>
+                    <div class="ingredient-name">Lettuce</div>
+                </div>
+                <div class="ingredient" draggable="true" data-ingredient="chili">
+                    <div class="ingredient-icon">🌶️</div>
+                    <div class="ingredient-name">Chili</div>
+                </div>
+                <div class="ingredient" draggable="true" data-ingredient="lime">
+                    <div class="ingredient-icon">🍋</div>
+                    <div class="ingredient-name">Lime</div>
+                </div>
+            </div>
 
-            document.getElementById('narrative').innerHTML = summaryHTML;
+            <div class="cooking-message" id="cookingMessage"></div>
+        </div>
+    </div>
 
-            // Show completion portrait
-            const portraitEl = document.getElementById('customerPortrait');
-            portraitEl.textContent = '✓';
-            portraitEl.style.background = 'linear-gradient(135deg, #4caf50, #45a049)';
+    <!-- ===================================
+         SCENE 4: OUTCOME / REFLECTION
+         =================================== -->
+    <div id="outcome-scene" class="scene">
+        <div class="container">
+            <h2 class="scene-title">Night Market Memories</h2>
 
-            document.getElementById('choices').innerHTML = '';
-            document.getElementById('restartBtn').classList.remove('hidden');
+            <div class="summary-card">
+                <p class="summary-text">You've served 3 customers tonight.</p>
+                <p class="summary-text">Every choice changed someone's mood.</p>
+                <p class="summary-text">Every flavor left a story behind.</p>
 
-            // Reset background
-            document.body.style.background = 'linear-gradient(135deg, #2c1810 0%, #4a2c1f 50%, #1a0f08 100%)';
-        }
+                <div class="taco-illustration">
+                    <div class="taco-glow"></div>
+                    🌮
+                </div>
 
-        /**
-         * Update progress tracker dots
-         */
-        function updateProgressTracker(completed = false) {
-            const dots = document.querySelectorAll('.progress-dot');
-            dots.forEach((dot, index) => {
-                dot.classList.remove('active', 'completed');
-                if (index < storyState.currentCustomer) {
-                    dot.classList.add('completed');
-                } else if (index === storyState.currentCustomer) {
-                    if (completed) {
-                        dot.classList.add('completed');
-                    } else {
-                        dot.classList.add('active');
-                    }
-                }
-            });
-        }
+                <div class="customer-summary" id="customerSummary"></div>
+            </div>
 
-        /**
-         * Restart the entire experience
-         */
-        function restartStory() {
-            // Reset background
-            document.body.style.background = 'linear-gradient(135deg, #2c1810 0%, #4a2c1f 50%, #1a0f08 100%)';
+            <div class="final-message">
+                Every choice leaves a flavor behind.
+            </div>
 
-            // Reset UI
-            document.getElementById('choiceStage').textContent = 'Welcome';
+            <button class="restart-btn" onclick="restartGame()">Restart the Night</button>
+        </div>
+    </div>
 
-            const portraitEl = document.getElementById('customerPortrait');
-            portraitEl.textContent = '?';
-            portraitEl.style.background = 'linear-gradient(135deg, #ff8c42, #ff6b35)';
+    <!-- Audio elements (placeholder paths - replace with actual sound files) -->
+    <audio id="ambientSound" loop>
+        <source src="sounds/night-market-ambient.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sizzleSound">
+        <source src="sounds/sizzle.mp3" type="audio/mpeg">
+    </audio>
 
-            document.getElementById('narrative').textContent =
-                'The night market hums with life. Steam rises from food stalls, mixing with laughter and music. You stand behind your taco cart, ready to serve. Your first customer approaches...';
-
-            // Reset choices
-            const choicesContainer = document.getElementById('choices');
-            choicesContainer.innerHTML = '';
-            const startBtn = document.createElement('button');
-            startBtn.className = 'choice-btn';
-            startBtn.textContent = 'Begin Your Shift';
-            startBtn.onclick = startStory;
-            choicesContainer.appendChild(startBtn);
-
-            // Hide restart button
-            document.getElementById('restartBtn').classList.add('hidden');
-
-            // Clear feedback
-            const feedbackEl = document.getElementById('feedback');
-            feedbackEl.classList.remove('show', 'positive', 'neutral', 'curious');
-
-            // Reset progress tracker
-            document.querySelectorAll('.progress-dot').forEach(dot => {
-                dot.classList.remove('active', 'completed');
-            });
-        }
-
-        /* ===================================
-           OPTIONAL ENHANCEMENTS
-           =================================== */
-
-        // You can add ambient sound here by uncommenting:
-        // const ambientSound = new Audio('night-market-ambience.mp3');
-        // ambientSound.loop = true;
-        // ambientSound.volume = 0.3;
-        // Call ambientSound.play() when user clicks "Begin Your Shift"
-
-        // Add keyboard navigation for accessibility
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'r' || e.key === 'R') {
-                const restartBtn = document.getElementById('restartBtn');
-                if (!restartBtn.classList.contains('hidden')) {
-                    restartStory();
-                }
-            }
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
