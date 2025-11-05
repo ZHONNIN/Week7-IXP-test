@@ -17,56 +17,72 @@ const BLANK_OPTIONS = {
 };
 
 /**
- * Ending definitions with deterministic rules
- * Rules are evaluated in order; first match wins
+ * Ending definitions with deterministic rules (priority order)
+ * Rules are evaluated in this exact order; first match wins
  */
 const ENDING_RULES = [
+  // R1: If DECISION == "leave"
   {
     id: 'COLD_FAREWELL',
     condition: (vals) => vals.DECISION === 'leave',
-    text: "You trimmed the moment down to travel size.\nDeparture is a sentence without a comma, and you carried it well."
+    text: `You trimmed the moment down to travel size.
+Departure is a sentence without a comma, and you carried it well.`
   },
+  // R2: Else if DECISION == "begin again"
   {
     id: 'BLOOM_RESTART',
     condition: (vals) => vals.DECISION === 'begin again',
-    text: "You reopened the day like a door.\nIt wasn't a return, but a start that keeps starting."
+    text: `You reopened the day like a door.
+It wasn't a return, but a start that keeps starting.`
   },
+  // R3: Else if (OBJECT == "key" && PLACE == "museum")
   {
     id: 'THRESHOLD',
     condition: (vals) => vals.OBJECT === 'key' && vals.PLACE === 'museum',
-    text: "Among rooms that remember everything, you chose the key.\nSome doors open forward; some open into a different kind of past."
+    text: `Among rooms that remember everything, you chose the key.
+Some doors open forward; some open into a different kind of past.`
   },
+  // R4: Else if (OBJECT == "map" && PLACE == "station")
   {
     id: 'JOURNEY',
     condition: (vals) => vals.OBJECT === 'map' && vals.PLACE === 'station',
-    text: "The station gave the map a pulse.\nStaying still felt like moving, and the tracks agreed."
+    text: `The station gave the map a pulse.
+Staying still felt like moving, and the tracks agreed.`
   },
+  // R5: Else if (DECISION == "stay" && TIME == "midnight" && VERB == "hiding")
   {
     id: 'QUIET_SHELTER',
     condition: (vals) => vals.DECISION === 'stay' && vals.TIME === 'midnight' && vals.VERB === 'hiding',
-    text: "Midnight kept the noise outside.\nHiding turned into shelter, and shelter into a promise."
+    text: `Midnight kept the noise outside.
+Hiding turned into shelter, and shelter into a promise.`
   },
+  // R6: Else if (DECISION == "stay" && VERB == "running")
   {
     id: 'STILLNESS',
     condition: (vals) => vals.DECISION === 'stay' && vals.VERB === 'running',
-    text: "You let the running stop inside the sentence.\nThe street kept going; you didn't need to."
+    text: `You let the running stop inside the sentence.
+The street kept going; you didn't need to.`
   },
+  // R7: Else if DECISION == "stay"
   {
     id: 'WARM_KEEP',
     condition: (vals) => vals.DECISION === 'stay',
-    text: "You kept the part that holds.\nThe curtain still moves, but now it feels like breathing."
+    text: `You kept the part that holds.
+The curtain still moves, but now it feels like breathing.`
   },
+  // R8: Else (fallback)
   {
     id: 'NEUTRAL_DRIFT',
-    condition: () => true, // Fallback
-    text: "You adjusted the wording and the day went on.\nNot everything needs a headline to mean something."
+    condition: () => true,
+    text: `You adjusted the wording and the day went on.
+Not everything needs a headline to mean something.`
   }
 ];
 
 // ===== STATE =====
 
 /**
- * Current state of all blanks
+ * Current state of all blanks (normalized to lowercase)
  */
 const state = {
   TIME: '',
@@ -99,7 +115,7 @@ const blankInputs = {
 
 const finalStoryEl = document.getElementById('final-story');
 const summaryCardEl = document.getElementById('summary-card');
-const endingParagraphEl = document.getElementById('ending-paragraph');
+const endingTextEl = document.getElementById('ending-text');
 
 const copyBtn = document.getElementById('copy-btn');
 const editAgainBtn = document.getElementById('edit-again-btn');
@@ -129,11 +145,18 @@ function init() {
     input.addEventListener('input', handleBlankInput);
     input.addEventListener('blur', handleBlankBlur);
 
-    // Prevent HTML paste
+    // Prevent HTML paste - paste only plain text
     input.addEventListener('paste', (e) => {
       e.preventDefault();
       const text = (e.clipboardData || window.clipboardData).getData('text/plain');
-      document.execCommand('insertText', false, text.trim());
+      const trimmedText = text.trim();
+      // Use modern approach or fallback
+      if (document.execCommand) {
+        document.execCommand('insertText', false, trimmedText);
+      } else {
+        input.value = trimmedText;
+        handleBlankInput({ target: input });
+      }
     });
   });
 
@@ -255,12 +278,6 @@ function areAllBlanksValid() {
 function updateGenerateButton() {
   const allValid = areAllBlanksValid();
   generateBtn.disabled = !allValid;
-
-  if (allValid) {
-    document.querySelector('.hint-text').textContent = 'Ready to generate your ending';
-  } else {
-    document.querySelector('.hint-text').textContent = 'Fill all blanks with valid options to continue';
-  }
 }
 
 // ===== INPUT HANDLERS =====
@@ -270,6 +287,10 @@ function updateGenerateButton() {
  */
 function handleBlankInput(e) {
   const input = e.target;
+
+  // Trim whitespace
+  input.value = input.value.trim();
+
   updateValidation(input);
   updateGenerateButton();
   updateChips();
@@ -281,6 +302,7 @@ function handleBlankInput(e) {
  */
 function handleBlankBlur(e) {
   const input = e.target;
+  input.value = input.value.trim();
   updateValidation(input);
 }
 
@@ -291,11 +313,11 @@ function handleBlankBlur(e) {
  */
 function updateChips() {
   const chipLabels = {
-    TIME: 'Time',
-    PLACE: 'Place',
-    VERB: 'Action',
-    OBJECT: 'Object',
-    DECISION: 'Decision'
+    TIME: 'time',
+    PLACE: 'place',
+    VERB: 'action',
+    OBJECT: 'object',
+    DECISION: 'decision'
   };
 
   chipsContainer.innerHTML = '';
@@ -377,9 +399,9 @@ function resetAllBlanks() {
 
 /**
  * Determine which ending to use based on deterministic rules
+ * Evaluates rules in priority order; first match wins
  */
 function determineEnding() {
-  // Evaluate rules in order; first match wins
   for (const rule of ENDING_RULES) {
     if (rule.condition(state)) {
       return rule;
@@ -394,12 +416,10 @@ function determineEnding() {
  * Generate the final story text with highlighted selections
  */
 function generateFinalStory() {
-  return `
-    <p>I still remember that morning, though some details keep changing.</p>
-    <p>We met on a <span class="highlight">${state.TIME}</span> at the <span class="highlight">${state.PLACE}</span>.</p>
-    <p>You were <span class="highlight">${state.VERB}</span> while I held a small <span class="highlight">${state.OBJECT}</span>.</p>
-    <p>When the curtain moved, we decided to <span class="highlight">${state.DECISION}</span>.</p>
-  `;
+  return `I still remember that morning, though some details keep changing.<br>
+We met on a <span class="highlight">${state.TIME}</span> at the <span class="highlight">${state.PLACE}</span>.<br>
+You were <span class="highlight">${state.VERB}</span> while I held a small <span class="highlight">${state.OBJECT}</span>.<br>
+When the curtain moved, we decided to <span class="highlight">${state.DECISION}</span>.`;
 }
 
 /**
@@ -407,19 +427,14 @@ function generateFinalStory() {
  */
 function generateSummaryCard() {
   const items = [
-    { label: 'Time', value: state.TIME },
-    { label: 'Place', value: state.PLACE },
-    { label: 'Action', value: state.VERB },
-    { label: 'Object', value: state.OBJECT },
-    { label: 'Decision', value: state.DECISION }
+    `Time: <strong>${state.TIME}</strong>`,
+    `Place: <strong>${state.PLACE}</strong>`,
+    `Verb: <strong>${state.VERB}</strong>`,
+    `Object: <strong>${state.OBJECT}</strong>`,
+    `Decision: <strong>${state.DECISION}</strong>`
   ];
 
-  return items.map(item => `
-    <div class="summary-item">
-      <span class="label">${item.label}:</span>
-      <span class="value">${item.value}</span>
-    </div>
-  `).join('');
+  return items.map(item => `<span class="summary-item">${item}</span>`).join('');
 }
 
 /**
@@ -428,7 +443,7 @@ function generateSummaryCard() {
 function generateEnding() {
   if (!areAllBlanksValid()) return;
 
-  // Determine ending
+  // Determine ending using deterministic rules
   const ending = determineEnding();
 
   // Populate final story
@@ -437,8 +452,8 @@ function generateEnding() {
   // Populate summary card
   summaryCardEl.innerHTML = generateSummaryCard();
 
-  // Populate ending paragraph (convert \n to <br>)
-  endingParagraphEl.innerHTML = ending.text.replace(/\n/g, '<br>');
+  // Populate ending text (preserve line breaks)
+  endingTextEl.innerHTML = ending.text.replace(/\n/g, '<br>');
 
   // Show ending panel
   showEndingPanel();
@@ -450,14 +465,14 @@ function generateEnding() {
  * Copy the final story to clipboard
  */
 function copyStory() {
-  const storyText = `
-I still remember that morning, though some details keep changing.
+  const ending = determineEnding();
+
+  const storyText = `I still remember that morning, though some details keep changing.
 We met on a ${state.TIME} at the ${state.PLACE}.
 You were ${state.VERB} while I held a small ${state.OBJECT}.
 When the curtain moved, we decided to ${state.DECISION}.
 
-${endingParagraphEl.textContent}
-  `.trim();
+${ending.text}`;
 
   navigator.clipboard.writeText(storyText).then(() => {
     // Visual feedback

@@ -24,7 +24,7 @@
   --transition-smooth: 220ms ease;
 }
 
-/* Theme-specific color overrides */
+/* Theme-specific color overrides based on DECISION blank */
 body[data-theme="stay"] {
   --accent-color: #FF7A59;
   --bg-gradient-start: #FFF3E8;
@@ -69,6 +69,7 @@ body {
   display: block;
   opacity: 1;
   transform: translateY(0);
+  animation: fadeInUp 0.4s ease forwards;
 }
 
 /* ===== INTRO PANEL ===== */
@@ -84,7 +85,7 @@ body {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
 }
 
-.main-title {
+.intro-title {
   font-family: var(--font-serif);
   font-size: 3.5rem;
   font-weight: 400;
@@ -93,7 +94,7 @@ body {
   letter-spacing: -0.5px;
 }
 
-.subtitle {
+.intro-subtitle {
   font-family: var(--font-sans);
   font-size: 0.95rem;
   text-transform: uppercase;
@@ -145,7 +146,7 @@ body {
   opacity: 0.6;
 }
 
-.secondary-btn {
+.control-btn {
   font-family: var(--font-sans);
   background: white;
   color: #444;
@@ -158,7 +159,7 @@ body {
   font-weight: 500;
 }
 
-.secondary-btn:hover {
+.control-btn:hover {
   border-color: var(--accent-color);
   color: var(--accent-color);
   background: rgba(255, 255, 255, 0.95);
@@ -173,8 +174,8 @@ body {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
 }
 
-/* Controls Bar */
-.controls-bar {
+/* Controls Row */
+.controls-row {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -207,7 +208,7 @@ body {
   color: white;
 }
 
-.control-buttons {
+.button-group {
   display: flex;
   gap: 10px;
 }
@@ -223,10 +224,6 @@ body {
   line-height: 2;
   color: #333;
   letter-spacing: 0.2px;
-}
-
-.story-text p {
-  margin-bottom: 1.5rem;
 }
 
 /* Blank Inputs */
@@ -273,14 +270,14 @@ body {
   color: #e74c3c;
 }
 
-.blank-input.invalid:focus + .validation-tooltip,
-.blank-input.invalid:hover + .validation-tooltip {
+.blank-input.invalid:focus + .error-tooltip,
+.blank-input.invalid:hover + .error-tooltip {
   opacity: 1;
   visibility: visible;
 }
 
-/* Validation Tooltip */
-.validation-tooltip {
+/* Error Tooltip */
+.error-tooltip {
   position: absolute;
   bottom: -32px;
   left: 50%;
@@ -299,7 +296,7 @@ body {
   z-index: 10;
 }
 
-.validation-tooltip::before {
+.error-tooltip::before {
   content: '';
   position: absolute;
   top: -4px;
@@ -316,13 +313,6 @@ body {
 .generate-container {
   text-align: center;
   margin-top: 40px;
-}
-
-.hint-text {
-  font-family: var(--font-sans);
-  font-size: 0.85rem;
-  color: #888;
-  margin-top: 12px;
 }
 
 /* ===== ENDING PANEL ===== */
@@ -356,10 +346,6 @@ body {
   border-left: 4px solid var(--accent-color);
 }
 
-.final-story p {
-  margin-bottom: 1.2rem;
-}
-
 .final-story .highlight {
   color: var(--accent-color);
   font-weight: 600;
@@ -374,41 +360,29 @@ body {
   margin-bottom: 32px;
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 12px;
   justify-content: center;
+  align-items: center;
 }
 
 .summary-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
   font-size: 0.9rem;
   color: #555;
 }
 
-.summary-item .label {
-  font-weight: 600;
-  color: #333;
-}
-
-.summary-item .value {
-  color: var(--accent-color);
-  font-weight: 500;
-}
-
 .summary-item::after {
   content: '•';
-  margin-left: 16px;
+  margin: 0 8px;
   color: #ccc;
 }
 
 .summary-item:last-child::after {
   content: '';
-  margin-left: 0;
+  margin: 0;
 }
 
-/* Ending Paragraph */
-.ending-paragraph {
+/* Ending Text */
+.ending-text {
   font-family: var(--font-serif);
   font-size: 1.2rem;
   line-height: 1.9;
@@ -431,7 +405,7 @@ body {
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1024px) {
-  .main-title {
+  .intro-title {
     font-size: 2.8rem;
   }
 
@@ -446,18 +420,18 @@ body {
     padding: 30px;
   }
 
-  .controls-bar {
+  .controls-row {
     flex-direction: column;
   }
 
-  .control-buttons {
+  .button-group {
     width: 100%;
     justify-content: flex-end;
   }
 }
 
 @media (max-width: 768px) {
-  .main-title {
+  .intro-title {
     font-size: 2.2rem;
   }
 
@@ -498,8 +472,4 @@ input:focus-visible {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.panel.active {
-  animation: fadeInUp 0.4s ease forwards;
 }
