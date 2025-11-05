@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Build Your Self - Interactive Persona Configurator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+            transition: background 1s ease;
+        }
+
+        /* Scene Container */
+        .scene {
+            display: none;
+            min-height: 100vh;
+            padding: 40px 20px;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        .scene.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+        }
+
+        /* Intro Scene */
+        .intro-content {
+            text-align: center;
+            max-width: 800px;
+        }
+
+        .intro-content h1 {
+            font-size: 4rem;
+            font-weight: 300;
+            letter-spacing: 8px;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #ffffff, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.5)); }
+            to { filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.8)); }
+        }
+
+        .intro-content .subtitle {
+            font-size: 1.3rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 60px;
+            opacity: 0.8;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            border: none;
+            color: white;
+            padding: 18px 50px;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 212, 255, 0.6);
+        }
+
+        /* Configurator Scene */
+        .configurator-content {
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .configurator-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .configurator-header h2 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+        }
+
+        .configurator-header .progress {
+            font-size: 0.9rem;
+            opacity: 0.6;
+            letter-spacing: 1px;
+        }
+
+        /* Car Preview */
+        .car-preview {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 50px;
+            min-height: 250px;
+        }
+
+        #car-silhouette {
+            width: 400px;
+            height: auto;
+            filter: drop-shadow(0 10px 40px rgba(0, 212, 255, 0.5));
+            transition: all 0.8s ease;
+        }
+
+        /* Reflection Text */
+        .reflection-text {
+            text-align: center;
+            font-size: 1.2rem;
+            font-style: italic;
+            opacity: 0.7;
+            margin-bottom: 40px;
+            min-height: 30px;
+            letter-spacing: 1px;
+            transition: all 0.5s ease;
+        }
+
+        /* Configuration Categories */
+        .config-categories {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .category {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .category-title {
+            font-size: 1.3rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .category-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .option-btn {
+            flex: 1;
+            min-width: 200px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 20px 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .option-btn .option-name {
+            font-weight: 600;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .option-btn .option-desc {
+            font-size: 0.85rem;
+            opacity: 0.7;
+            letter-spacing: 0.5px;
+        }
+
+        .option-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(0, 212, 255, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .option-btn.selected {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.3), rgba(0, 153, 204, 0.3));
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .complete-btn {
+            display: block;
+            margin: 40px auto 0;
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            border: none;
+            color: white;
+            padding: 15px 45px;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.4);
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .complete-btn.enabled {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .complete-btn.enabled:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 212, 255, 0.6);
+        }
+
+        /* Result Scene */
+        .result-content {
+            text-align: center;
+            max-width: 900px;
+        }
+
+        .result-content h2 {
+            font-size: 2rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        .persona-card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(0, 212, 255, 0.4);
+            border-radius: 20px;
+            padding: 50px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 50px rgba(0, 212, 255, 0.3);
+            margin-bottom: 40px;
+        }
+
+        .persona-name {
+            font-size: 2.2rem;
+            font-weight: 400;
+            letter-spacing: 3px;
+            margin-bottom: 30px;
+            background: linear-gradient(90deg, #ffffff, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .persona-attributes {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .attribute {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 3px solid #00d4ff;
+        }
+
+        .attribute-label {
+            font-size: 0.85rem;
+            opacity: 0.6;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .attribute-value {
+            font-size: 1.1rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .persona-description {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            opacity: 0.9;
+            font-style: italic;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .result-car-preview {
+            margin: 40px 0;
+        }
+
+        .result-car-preview svg {
+            width: 500px;
+            height: auto;
+            filter: drop-shadow(0 15px 50px rgba(0, 212, 255, 0.6));
+        }
+
+        .rebuild-btn {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            border: none;
+            color: white;
+            padding: 15px 45px;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .rebuild-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 212, 255, 0.6);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .intro-content h1 {
+                font-size: 2.5rem;
+                letter-spacing: 4px;
+            }
+
+            .configurator-header h2 {
+                font-size: 1.8rem;
+            }
+
+            #car-silhouette,
+            .result-car-preview svg {
+                width: 300px;
+            }
+
+            .persona-attributes {
+                grid-template-columns: 1fr;
+            }
+
+            .option-btn {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Intro Scene -->
+    <div class="scene active" id="intro-scene">
+        <div class="intro-content">
+            <h1>BUILD YOUR SELF</h1>
+            <p class="subtitle">Configure your identity. One choice at a time.</p>
+            <button class="start-btn" onclick="startConfiguration()">START CONFIGURATION</button>
+        </div>
+    </div>
+
+    <!-- Configurator Scene -->
+    <div class="scene" id="configurator-scene">
+        <div class="configurator-content">
+            <div class="configurator-header">
+                <h2>IDENTITY CONFIGURATOR</h2>
+                <p class="progress" id="progress-text">Configure your persona</p>
+            </div>
+
+            <!-- Car Preview -->
+            <div class="car-preview">
+                <svg id="car-silhouette" viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Futuristic Car Silhouette -->
+                    <defs>
+                        <linearGradient id="carGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+
+                    <!-- Main body -->
+                    <path id="car-body" d="M 80 120 L 120 80 L 200 80 L 240 100 L 380 100 L 420 120 L 420 150 L 80 150 Z"
+                          fill="url(#carGradient)" opacity="0.9"/>
+
+                    <!-- Windshield -->
+                    <path d="M 140 80 L 180 60 L 220 60 L 240 80 Z"
+                          fill="url(#carGradient)" opacity="0.5"/>
+
+                    <!-- Wheels -->
+                    <circle cx="140" cy="150" r="25" fill="url(#carGradient)" opacity="0.7"/>
+                    <circle cx="360" cy="150" r="25" fill="url(#carGradient)" opacity="0.7"/>
+
+                    <!-- Details -->
+                    <line x1="100" y1="150" x2="400" y2="150" stroke="url(#carGradient)" stroke-width="3" opacity="0.8"/>
+                    <circle cx="400" cy="120" r="8" fill="#00d4ff" opacity="0.9"/>
+                </svg>
+            </div>
+
+            <!-- Reflection Text -->
+            <div class="reflection-text" id="reflection-text">
+                Choose your configuration to begin...
+            </div>
+
+            <!-- Configuration Categories -->
+            <div class="config-categories">
+                <!-- Shell Color -->
+                <div class="category">
+                    <div class="category-title">1. SHELL COLOR — Personality Tone</div>
+                    <div class="category-options">
+                        <button class="option-btn" onclick="selectOption('shell', 'arctic', this)">
+                            <span class="option-name">Arctic White</span>
+                            <span class="option-desc">calm, detached, logical</span>
+                        </button>
+                        <button class="option-btn" onclick="selectOption('shell', 'crimson', this)">
+                            <span class="option-name">Crimson Pulse</span>
+                            <span class="option-desc">passionate, bold, impulsive</span>
+                        </button>
+                        <button class="option-btn" onclick="selectOption('shell', 'obsidian', this)">
+                            <span class="option-name">Obsidian Black</span>
+                            <span class="option-desc">mysterious, introspective, secretive</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Engine Type -->
+                <div class="category">
+                    <div class="category-title">2. ENGINE TYPE — Motivation Source</div>
+                    <div class="category-options">
+                        <button class="option-btn" onclick="selectOption('engine', 'desire', this)">
+                            <span class="option-name">Desire Engine</span>
+                            <span class="option-desc">driven by longing and need</span>
+                        </button>
+                        <button class="option-btn" onclick="selectOption('engine', 'belief', this)">
+                            <span class="option-name">Belief Engine</span>
+                            <span class="option-desc">powered by conviction and purpose</span>
+                        </button>
+                        <button class="option-btn" onclick="selectOption('engine', 'fear', this)">
+                            <span class="option-name">Fear Engine</span>
+                            <span class="option-desc">powered by anxiety and survival instinct</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Driving Mode -->
+                <div class="category">
+                    <div class="category-title">3. DRIVING MODE — Lifestyle Attitude</div>
+                    <div class="category-options">
+                        <button class="option-btn" onclick="selectOption('mode', 'explorer', this)">
+                            <span class="option-name">Explorer</span>
+                            <span class="option-desc">seeks new experiences</span>
+                        </button>
+                        <button class="option-btn" onclick="selectOption('mode', 'balancer', this)">
+                            <span class="option-name">Balancer</span>
+                            <span class="option-desc">maintains harmony</span>
+                        </button>
+                        <button class="option-btn" onclick="selectOption('mode', 'escapist', this)">
+                            <span class="option-name">Escapist</span>
+                            <span class="option-desc">runs away from pressure</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Interior Material -->
+                <div class="category">
+                    <div class="category-title">4. INTERIOR MATERIAL — Emotional Texture</div>
+                    <div class="category-options">
+                        <button class="option-btn" onclick="selectOption('interior', 'velvet', this)">
+                            <span class="option-name">Soft Velvet</span>
+                            <span class="option-desc">empathetic, gentle</span>
+                        </button>
+                        <button class="option-btn" onclick="selectOption('interior', 'steel', this)">
+                            <span class="option-name">Polished Steel</span>
+                            <span class="option-desc">rational, reserved</span>
+                        </button>
+                        <button class="option-btn" onclick="selectOption('interior', 'leather', this)">
+                            <span class="option-name">Raw Leather</span>
+                            <span class="option-desc">emotional, honest</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <button class="complete-btn" id="complete-btn" onclick="showResults()">
+                FINALIZE YOUR SELF
+            </button>
+        </div>
+    </div>
+
+    <!-- Result Scene -->
+    <div class="scene" id="result-scene">
+        <div class="result-content">
+            <h2>YOUR PERSONA VEHICLE</h2>
+
+            <div class="persona-card">
+                <div class="persona-name" id="persona-name"></div>
+
+                <div class="persona-attributes" id="persona-attributes"></div>
+
+                <div class="result-car-preview">
+                    <svg id="result-car" viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="resultCarGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+
+                        <path id="result-car-body" d="M 80 120 L 120 80 L 200 80 L 240 100 L 380 100 L 420 120 L 420 150 L 80 150 Z"
+                              fill="url(#resultCarGradient)" opacity="0.9"/>
+                        <path d="M 140 80 L 180 60 L 220 60 L 240 80 Z"
+                              fill="url(#resultCarGradient)" opacity="0.5"/>
+                        <circle cx="140" cy="150" r="25" fill="url(#resultCarGradient)" opacity="0.7"/>
+                        <circle cx="360" cy="150" r="25" fill="url(#resultCarGradient)" opacity="0.7"/>
+                        <line x1="100" y1="150" x2="400" y2="150" stroke="url(#resultCarGradient)" stroke-width="3" opacity="0.8"/>
+                        <circle cx="400" cy="120" r="8" fill="#00d4ff" opacity="0.9"/>
+                    </svg>
+                </div>
+
+                <div class="persona-description" id="persona-description"></div>
+            </div>
+
+            <button class="rebuild-btn" onclick="restart()">REBUILD YOURSELF</button>
+        </div>
+    </div>
+
+    <script>
+        // Audio feedback (using Web Audio API for clicks)
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playClickSound() {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.1);
+        }
+
+        // State management
+        const state = {
+            shell: null,
+            engine: null,
+            mode: null,
+            interior: null
+        };
+
+        // Configuration data
+        const config = {
+            shell: {
+                arctic: {
+                    name: 'Arctic White',
+                    color: '#e8f4f8',
+                    gradient: 'linear-gradient(135deg, #0a0a0a 0%, #1a3a4e 100%)',
+                    reflection: 'Your calmness hides an ocean.',
+                    dropShadow: 'drop-shadow(0 10px 40px rgba(232, 244, 248, 0.5))'
+                },
+                crimson: {
+                    name: 'Crimson Pulse',
+                    color: '#ff3366',
+                    gradient: 'linear-gradient(135deg, #1a0a0f 0%, #3a1a2e 100%)',
+                    reflection: 'Boldness burns but also warms.',
+                    dropShadow: 'drop-shadow(0 10px 40px rgba(255, 51, 102, 0.5))'
+                },
+                obsidian: {
+                    name: 'Obsidian Black',
+                    color: '#1a1a1a',
+                    gradient: 'linear-gradient(135deg, #0a0a0a 0%, #0f0f1e 100%)',
+                    reflection: 'Mystery is your armor and your art.',
+                    dropShadow: 'drop-shadow(0 10px 40px rgba(138, 43, 226, 0.5))'
+                }
+            },
+            engine: {
+                desire: {
+                    name: 'Desire Engine',
+                    reflection: 'Longing fuels your every move.',
+                    trait: 'driven by need and wanting'
+                },
+                belief: {
+                    name: 'Belief Engine',
+                    reflection: 'Purpose gives direction to the chaos.',
+                    trait: 'powered by conviction'
+                },
+                fear: {
+                    name: 'Fear Engine',
+                    reflection: 'Even fear keeps the engine alive.',
+                    trait: 'survival instinct drives you'
+                }
+            },
+            mode: {
+                explorer: {
+                    name: 'Explorer',
+                    reflection: 'The unknown calls and you answer.',
+                    trait: 'always seeking new horizons'
+                },
+                balancer: {
+                    name: 'Balancer',
+                    reflection: 'Harmony is your compass.',
+                    trait: 'maintaining equilibrium'
+                },
+                escapist: {
+                    name: 'Escapist',
+                    reflection: 'You run not from fear, but toward freedom.',
+                    trait: 'releasing pressure gracefully'
+                }
+            },
+            interior: {
+                velvet: {
+                    name: 'Soft Velvet',
+                    reflection: 'Gentleness is not weakness—it is wisdom.',
+                    trait: 'empathetic and tender'
+                },
+                steel: {
+                    name: 'Polished Steel',
+                    reflection: 'Your logic is your shield.',
+                    trait: 'rational and composed'
+                },
+                leather: {
+                    name: 'Raw Leather',
+                    reflection: 'Honesty, raw and unfiltered.',
+                    trait: 'emotionally authentic'
+                }
+            }
+        };
+
+        function startConfiguration() {
+            playClickSound();
+            transitionScene('intro-scene', 'configurator-scene');
+        }
+
+        function selectOption(category, option, button) {
+            playClickSound();
+
+            // Update state
+            state[category] = option;
+
+            // Remove previous selection in category
+            const categoryButtons = button.parentElement.querySelectorAll('.option-btn');
+            categoryButtons.forEach(btn => btn.classList.remove('selected'));
+
+            // Add selection to current button
+            button.classList.add('selected');
+
+            // Update visuals based on selection
+            updateVisuals(category, option);
+
+            // Check if all selections are made
+            checkCompletion();
+        }
+
+        function updateVisuals(category, option) {
+            const configData = config[category][option];
+
+            // Update reflection text
+            const reflectionText = document.getElementById('reflection-text');
+            reflectionText.style.opacity = '0';
+
+            setTimeout(() => {
+                reflectionText.textContent = configData.reflection;
+                reflectionText.style.opacity = '0.7';
+            }, 300);
+
+            // Update car color and background for shell color
+            if (category === 'shell') {
+                const carBody = document.getElementById('car-body');
+                const carSilhouette = document.getElementById('car-silhouette');
+
+                // Update gradient
+                const gradient = document.querySelector('#carGradient stop:nth-child(2)');
+                gradient.setAttribute('style', `stop-color:${configData.color};stop-opacity:1`);
+
+                // Update background
+                document.body.style.background = configData.gradient;
+
+                // Update shadow
+                carSilhouette.style.filter = configData.dropShadow;
+            }
+        }
+
+        function checkCompletion() {
+            const allSelected = state.shell && state.engine && state.mode && state.interior;
+            const completeBtn = document.getElementById('complete-btn');
+
+            if (allSelected) {
+                completeBtn.classList.add('enabled');
+            }
+
+            // Update progress
+            const selected = Object.values(state).filter(v => v !== null).length;
+            document.getElementById('progress-text').textContent =
+                `${selected}/4 configurations complete`;
+        }
+
+        function showResults() {
+            if (!state.shell || !state.engine || !state.mode || !state.interior) {
+                return;
+            }
+
+            playClickSound();
+
+            // Generate persona
+            generatePersona();
+
+            // Transition to results
+            transitionScene('configurator-scene', 'result-scene');
+        }
+
+        function generatePersona() {
+            // Generate persona name
+            const shellData = config.shell[state.shell];
+            const engineData = config.engine[state.engine];
+            const modeData = config.mode[state.mode];
+
+            const modelNumber = Math.floor(Math.random() * 99) + 1;
+            const personaName = `Model ${shellData.name.split(' ')[0]}-${modelNumber}: The ${modeData.name} ${engineData.name.split(' ')[0]}`;
+
+            document.getElementById('persona-name').textContent = personaName;
+
+            // Generate attributes
+            const attributesHtml = `
+                <div class="attribute">
+                    <div class="attribute-label">SHELL COLOR</div>
+                    <div class="attribute-value">${shellData.name}</div>
+                </div>
+                <div class="attribute">
+                    <div class="attribute-label">ENGINE TYPE</div>
+                    <div class="attribute-value">${config.engine[state.engine].name}</div>
+                </div>
+                <div class="attribute">
+                    <div class="attribute-label">DRIVING MODE</div>
+                    <div class="attribute-value">${config.mode[state.mode].name}</div>
+                </div>
+                <div class="attribute">
+                    <div class="attribute-label">INTERIOR MATERIAL</div>
+                    <div class="attribute-value">${config.interior[state.interior].name}</div>
+                </div>
+            `;
+            document.getElementById('persona-attributes').innerHTML = attributesHtml;
+
+            // Generate description
+            const description = generateDescription();
+            document.getElementById('persona-description').textContent = description;
+
+            // Update result car color
+            const resultGradient = document.querySelector('#resultCarGradient stop:nth-child(2)');
+            resultGradient.setAttribute('style', `stop-color:${shellData.color};stop-opacity:1`);
+
+            const resultCar = document.getElementById('result-car');
+            resultCar.style.filter = shellData.dropShadow;
+        }
+
+        function generateDescription() {
+            const shellData = config.shell[state.shell];
+            const engineData = config.engine[state.engine];
+            const modeData = config.mode[state.mode];
+            const interiorData = config.interior[state.interior];
+
+            // Create contextual descriptions
+            const descriptions = {
+                'arctic-desire-explorer-velvet':
+                    "You are a paradox—calm on the surface but driven by deep longing within. Your gentle empathy guides you as you seek new experiences with quiet determination. You move through life like ice exploring warm waters.",
+
+                'arctic-desire-explorer-steel':
+                    "Logic and longing dance in you. You seek new horizons with rational precision, yet desire fuels your calculated explorations. You are a cool strategist with a burning core.",
+
+                'arctic-desire-explorer-leather':
+                    "Your calmness belies raw emotional honesty. Desire moves you toward new experiences, and you face them with unfiltered truth. You are ice that chooses to melt.",
+
+                'crimson-belief-explorer-velvet':
+                    "Passionate conviction drives you to new territories, yet you move with empathetic grace. You burn bright but warm others instead of consuming them. A gentle revolutionary.",
+
+                'crimson-belief-balancer-steel':
+                    "Bold conviction tempered by rational balance. You burn with purpose but maintain equilibrium through logic. A controlled fire that illuminates without destroying.",
+
+                'obsidian-fear-escapist-leather':
+                    "You carry your shadows openly. Fear propels you away from what threatens, yet you move with raw honesty about your nature. Mystery and authenticity coexist in you.",
+
+                // Generic fallback
+                'default':
+                    `You chose ${shellData.name} with a ${engineData.name}. You are ${interiorData.trait}, ${modeData.trait}. ${shellData.reflection} ${engineData.reflection} The world may not fully understand you—but you drive anyway.`
+            };
+
+            const key = `${state.shell}-${state.engine}-${state.mode}-${state.interior}`;
+            return descriptions[key] || descriptions['default'];
+        }
+
+        function restart() {
+            playClickSound();
+
+            // Reset state
+            state.shell = null;
+            state.engine = null;
+            state.mode = null;
+            state.interior = null;
+
+            // Reset selections
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+
+            // Reset complete button
+            document.getElementById('complete-btn').classList.remove('enabled');
+
+            // Reset background
+            document.body.style.background = 'linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%)';
+
+            // Reset reflection text
+            document.getElementById('reflection-text').textContent = 'Choose your configuration to begin...';
+
+            // Reset progress
+            document.getElementById('progress-text').textContent = 'Configure your persona';
+
+            // Transition back to intro
+            transitionScene('result-scene', 'intro-scene');
+        }
+
+        function transitionScene(fromId, toId) {
+            const fromScene = document.getElementById(fromId);
+            const toScene = document.getElementById(toId);
+
+            // Fade out current scene
+            fromScene.style.opacity = '0';
+
+            setTimeout(() => {
+                fromScene.classList.remove('active');
+                toScene.classList.add('active');
+
+                // Fade in new scene
+                setTimeout(() => {
+                    toScene.style.opacity = '1';
+                }, 50);
+            }, 800);
+        }
+    </script>
+</body>
+</html>
