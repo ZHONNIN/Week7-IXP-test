@@ -11,11 +11,11 @@
   <!-- INTRO PANEL -->
   <section id="intro-panel" class="panel active">
     <div class="intro-content">
-      <h1 class="main-title">Rewrite Me</h1>
-      <p class="subtitle">Fixed Blanks Edition</p>
+      <h1 class="intro-title">Rewrite Me</h1>
+      <p class="intro-subtitle">Fixed Blanks Edition</p>
       <p class="intro-description">
-        A story with selective memory.<br>
-        Only certain words can change—choose them carefully.
+        A short story where only specific words can change.<br>
+        Choose carefully—each choice shapes the ending.
       </p>
       <button id="begin-btn" class="primary-btn">Begin</button>
     </div>
@@ -26,105 +26,77 @@
     <div class="editor-content">
 
       <!-- Controls Top Bar -->
-      <div class="controls-bar">
+      <div class="controls-row">
         <div class="chips-container" id="chips-container">
           <!-- Chips will be dynamically populated -->
         </div>
-        <div class="control-buttons">
-          <button id="randomize-btn" class="secondary-btn" title="Fill with random valid options">Randomize</button>
-          <button id="reset-btn" class="secondary-btn" title="Clear all selections">Reset</button>
+        <div class="button-group">
+          <button id="randomize-btn" class="control-btn" title="Fill with random valid options">Randomize</button>
+          <button id="reset-btn" class="control-btn" title="Clear all selections">Reset</button>
         </div>
       </div>
 
       <!-- Story Text with Inline Inputs -->
       <div class="story-container">
-        <div class="story-text">
-          <p>I still remember that morning, though some details keep changing.</p>
-          <p>We met on a
-            <span class="blank-wrapper">
-              <input
-                type="text"
-                id="blank1"
-                class="blank-input"
-                list="time-options"
-                placeholder="time"
-                aria-label="Choose time of day"
-                data-blank="TIME"
-                autocomplete="off"
-                spellcheck="false"
-              >
-              <span class="validation-tooltip">Choose from the list</span>
-            </span>
-            at the
-            <span class="blank-wrapper">
-              <input
-                type="text"
-                id="blank2"
-                class="blank-input"
-                list="place-options"
-                placeholder="place"
-                aria-label="Choose place"
-                data-blank="PLACE"
-                autocomplete="off"
-                spellcheck="false"
-              >
-              <span class="validation-tooltip">Choose from the list</span>
-            </span>.
-          </p>
-          <p>You were
-            <span class="blank-wrapper">
-              <input
-                type="text"
-                id="blank3"
-                class="blank-input"
-                list="verb-options"
-                placeholder="action"
-                aria-label="Choose action"
-                data-blank="VERB"
-                autocomplete="off"
-                spellcheck="false"
-              >
-              <span class="validation-tooltip">Choose from the list</span>
-            </span>
-            while I held a small
-            <span class="blank-wrapper">
-              <input
-                type="text"
-                id="blank4"
-                class="blank-input"
-                list="object-options"
-                placeholder="object"
-                aria-label="Choose object"
-                data-blank="OBJECT"
-                autocomplete="off"
-                spellcheck="false"
-              >
-              <span class="validation-tooltip">Choose from the list</span>
-            </span>.
-          </p>
-          <p>When the curtain moved, we decided to
-            <span class="blank-wrapper">
-              <input
-                type="text"
-                id="blank5"
-                class="blank-input"
-                list="decision-options"
-                placeholder="decision"
-                aria-label="Choose decision"
-                data-blank="DECISION"
-                autocomplete="off"
-                spellcheck="false"
-              >
-              <span class="validation-tooltip">Choose from the list</span>
-            </span>.
-          </p>
-        </div>
+        <p class="story-text">I still remember that morning, though some details keep changing.<br>
+We met on a <span class="blank-wrapper"><input
+  type="text"
+  id="blank1"
+  class="blank-input"
+  list="time-options"
+  placeholder="time"
+  aria-label="Choose time of day"
+  data-blank="TIME"
+  autocomplete="off"
+  spellcheck="false"
+/><span class="error-tooltip">Choose from the list</span></span> at the <span class="blank-wrapper"><input
+  type="text"
+  id="blank2"
+  class="blank-input"
+  list="place-options"
+  placeholder="place"
+  aria-label="Choose place"
+  data-blank="PLACE"
+  autocomplete="off"
+  spellcheck="false"
+/><span class="error-tooltip">Choose from the list</span></span>.<br>
+You were <span class="blank-wrapper"><input
+  type="text"
+  id="blank3"
+  class="blank-input"
+  list="verb-options"
+  placeholder="action"
+  aria-label="Choose action"
+  data-blank="VERB"
+  autocomplete="off"
+  spellcheck="false"
+/><span class="error-tooltip">Choose from the list</span></span> while I held a small <span class="blank-wrapper"><input
+  type="text"
+  id="blank4"
+  class="blank-input"
+  list="object-options"
+  placeholder="object"
+  aria-label="Choose object"
+  data-blank="OBJECT"
+  autocomplete="off"
+  spellcheck="false"
+/><span class="error-tooltip">Choose from the list</span></span>.<br>
+When the curtain moved, we decided to <span class="blank-wrapper"><input
+  type="text"
+  id="blank5"
+  class="blank-input"
+  list="decision-options"
+  placeholder="decision"
+  aria-label="Choose decision"
+  data-blank="DECISION"
+  autocomplete="off"
+  spellcheck="false"
+/><span class="error-tooltip">Choose from the list</span></span>.</p>
       </div>
 
       <!-- Generate Button -->
       <div class="generate-container">
         <button id="generate-btn" class="primary-btn" disabled>Generate Ending</button>
-        <p class="hint-text">Fill all blanks with valid options to continue</p>
       </div>
 
       <!-- Datalists for constrained options -->
@@ -176,16 +148,16 @@
         <!-- Populated by JavaScript -->
       </div>
 
-      <!-- Ending Paragraph -->
-      <div class="ending-paragraph" id="ending-paragraph">
+      <!-- Ending Text -->
+      <div class="ending-text" id="ending-text">
         <!-- Populated by JavaScript -->
       </div>
 
       <!-- Action Buttons -->
       <div class="ending-actions">
-        <button id="copy-btn" class="secondary-btn">Copy Story</button>
-        <button id="edit-again-btn" class="secondary-btn">Edit Again</button>
-        <button id="save-json-btn" class="secondary-btn">Save JSON</button>
+        <button id="copy-btn" class="control-btn">Copy Story</button>
+        <button id="edit-again-btn" class="control-btn">Edit Again</button>
+        <button id="save-json-btn" class="control-btn">Save JSON</button>
       </div>
     </div>
   </section>
