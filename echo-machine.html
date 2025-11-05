@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Echo Machine</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            background: linear-gradient(135deg, #000000 0%, #1a0033 50%, #000033 100%);
+            color: #ffffff;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Animated wave background */
+        .wave-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            opacity: 0.3;
+        }
+
+        .wave {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at center, rgba(99, 102, 241, 0.3) 0%, transparent 70%);
+            animation: wave-animation 15s ease-in-out infinite;
+        }
+
+        .wave:nth-child(2) {
+            animation-delay: -5s;
+            animation-duration: 20s;
+        }
+
+        .wave:nth-child(3) {
+            animation-delay: -10s;
+            animation-duration: 25s;
+        }
+
+        @keyframes wave-animation {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.2;
+            }
+            50% {
+                transform: translate(-40%, -40%) scale(1.2);
+                opacity: 0.4;
+            }
+        }
+
+        /* Scene container */
+        .scene {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            width: 100%;
+            max-width: 800px;
+            padding: 40px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .scene.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 4rem;
+            text-shadow: 0 0 30px rgba(99, 102, 241, 0.8);
+            margin-bottom: 20px;
+            letter-spacing: 4px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #a0aec0;
+            margin-bottom: 40px;
+            text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+        }
+
+        /* Buttons */
+        button {
+            background: rgba(99, 102, 241, 0.2);
+            border: 2px solid rgba(99, 102, 241, 0.6);
+            color: #ffffff;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 10px rgba(99, 102, 241, 0.8);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+
+        button:hover {
+            background: rgba(99, 102, 241, 0.4);
+            border-color: rgba(99, 102, 241, 1);
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.6);
+            transform: translateY(-2px);
+        }
+
+        /* Input field */
+        input[type="text"] {
+            width: 100%;
+            padding: 20px;
+            font-size: 1.2rem;
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(99, 102, 241, 0.6);
+            color: #ffffff;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: inset 0 0 20px rgba(99, 102, 241, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: rgba(99, 102, 241, 1);
+            box-shadow: inset 0 0 20px rgba(99, 102, 241, 0.4), 0 0 30px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Pulse animation */
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        .pulse {
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        /* Echo display */
+        .echo-display {
+            font-size: 2.5rem;
+            line-height: 1.6;
+            min-height: 150px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        /* Floating letters */
+        .letter {
+            display: inline-block;
+            opacity: 0;
+            animation: float-up 3s ease-out forwards;
+            text-shadow: 0 0 20px rgba(99, 102, 241, 0.9);
+        }
+
+        @keyframes float-up {
+            0% {
+                opacity: 0;
+                transform: translateY(0) scale(1);
+            }
+            20% {
+                opacity: 1;
+            }
+            80% {
+                opacity: 0.8;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(1.5);
+            }
+        }
+
+        /* Echo message */
+        .echo-message {
+            font-size: 1.5rem;
+            color: #a0aec0;
+            font-style: italic;
+            margin-top: 40px;
+            text-shadow: 0 0 15px rgba(99, 102, 241, 0.7);
+            opacity: 0;
+            animation: fade-in 1s ease-in 2s forwards;
+        }
+
+        @keyframes fade-in {
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Button container */
+        .button-container {
+            margin-top: 40px;
+            opacity: 0;
+            animation: fade-in 1s ease-in 3s forwards;
+        }
+
+        /* Ending message */
+        .ending-message {
+            font-size: 1.3rem;
+            line-height: 2;
+            margin-bottom: 30px;
+            color: #a0aec0;
+        }
+
+        .ending-message strong {
+            color: #ffffff;
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(99, 102, 241, 0.8);
+        }
+
+        /* Hidden class */
+        .hidden {
+            display: none;
+        }
+
+        /* Hue rotation for background changes */
+        body.hue-shift-1 {
+            background: linear-gradient(135deg, #1a0033 0%, #330033 50%, #001a33 100%);
+        }
+
+        body.hue-shift-2 {
+            background: linear-gradient(135deg, #330000 0%, #1a0033 50%, #003333 100%);
+        }
+
+        body.hue-shift-3 {
+            background: linear-gradient(135deg, #001a33 0%, #330033 50%, #331a00 100%);
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated wave background -->
+    <div class="wave-container">
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+    </div>
+
+    <!-- Intro Scene -->
+    <div id="intro-scene" class="scene active">
+        <h1>Echo Machine</h1>
+        <p class="subtitle">Every word you send returns differently.</p>
+        <button id="start-btn">Start</button>
+    </div>
+
+    <!-- Input Scene -->
+    <div id="input-scene" class="scene hidden">
+        <h2 class="subtitle">What do you want to hear back?</h2>
+        <input type="text" id="text-input" placeholder="Type something you want to hear back…" maxlength="200">
+        <div>
+            <button id="send-text-btn">Send Text</button>
+            <button id="record-voice-btn">Record Voice</button>
+        </div>
+    </div>
+
+    <!-- Echo Scene -->
+    <div id="echo-scene" class="scene hidden">
+        <div class="echo-display" id="echo-display"></div>
+        <div class="echo-message" id="echo-message"></div>
+        <div class="button-container">
+            <button id="send-another-btn">Send another message</button>
+            <button id="save-echo-btn">Save this echo</button>
+        </div>
+    </div>
+
+    <!-- Ending Scene -->
+    <div id="ending-scene" class="scene hidden">
+        <div class="ending-message">
+            <strong>You have sent 3 echoes.</strong>
+            Each one changed as it returned.<br>
+            Do you still recognize your voice?
+        </div>
+        <button id="restart-btn">Restart the Machine</button>
+    </div>
+
+    <script>
+        // State management
+        let interactionCount = 0;
+        let currentInput = '';
+        let currentEcho = '';
+
+        // Scene elements
+        const introScene = document.getElementById('intro-scene');
+        const inputScene = document.getElementById('input-scene');
+        const echoScene = document.getElementById('echo-scene');
+        const endingScene = document.getElementById('ending-scene');
+
+        // Input elements
+        const textInput = document.getElementById('text-input');
+
+        // Buttons
+        const startBtn = document.getElementById('start-btn');
+        const sendTextBtn = document.getElementById('send-text-btn');
+        const recordVoiceBtn = document.getElementById('record-voice-btn');
+        const sendAnotherBtn = document.getElementById('send-another-btn');
+        const saveEchoBtn = document.getElementById('save-echo-btn');
+        const restartBtn = document.getElementById('restart-btn');
+
+        // Display elements
+        const echoDisplay = document.getElementById('echo-display');
+        const echoMessage = document.getElementById('echo-message');
+
+        // Scene transitions
+        function showScene(scene) {
+            [introScene, inputScene, echoScene, endingScene].forEach(s => {
+                s.classList.remove('active');
+                s.classList.add('hidden');
+            });
+
+            scene.classList.remove('hidden');
+            setTimeout(() => {
+                scene.classList.add('active');
+            }, 50);
+        }
+
+        // Text transformations
+        function transformText(text) {
+            // Mix of reversed, scrambled, and mirrored
+            const transformations = [
+                reverseText,
+                scrambleWords,
+                mirrorText,
+                reverseWords
+            ];
+
+            const randomTransform = transformations[Math.floor(Math.random() * transformations.length)];
+            return randomTransform(text);
+        }
+
+        function reverseText(text) {
+            return text.split('').reverse().join('');
+        }
+
+        function scrambleWords(text) {
+            return text.split(' ').map(word => {
+                if (word.length <= 2) return word;
+                const letters = word.split('');
+                const first = letters.shift();
+                const last = letters.pop();
+                // Shuffle middle letters
+                for (let i = letters.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [letters[i], letters[j]] = [letters[j], letters[i]];
+                }
+                return first + letters.join('') + last;
+            }).join(' ');
+        }
+
+        function mirrorText(text) {
+            return text + ' ' + text.split('').reverse().join('');
+        }
+
+        function reverseWords(text) {
+            return text.split(' ').reverse().join(' ');
+        }
+
+        // Generate echo message based on sentiment
+        function generateEchoMessage(text) {
+            const lowerText = text.toLowerCase();
+
+            if (lowerText.includes('love') || lowerText.includes('heart')) {
+                return 'Echo: Love lingers in distortion.';
+            } else if (lowerText.includes('fear') || lowerText.includes('afraid') || lowerText.includes('scared')) {
+                return 'Echo: Fear becomes rhythm.';
+            } else if (lowerText.includes('silence') || lowerText.includes('quiet')) {
+                return 'Echo: Silence has shape.';
+            } else if (lowerText.includes('dream') || lowerText.includes('sleep')) {
+                return 'Echo: Dreams echo endlessly.';
+            } else if (lowerText.includes('lost') || lowerText.includes('alone')) {
+                return 'Echo: Loss reverberates forever.';
+            } else if (lowerText.includes('time') || lowerText.includes('moment')) {
+                return 'Echo: Time bends in reflection.';
+            } else if (lowerText.includes('memory') || lowerText.includes('remember')) {
+                return 'Echo: Memory distorts beautifully.';
+            } else {
+                return 'Echo: You speak, I reshape.';
+            }
+        }
+
+        // Animate echo text
+        function animateEcho(text) {
+            echoDisplay.innerHTML = '';
+            echoMessage.textContent = '';
+
+            // Create floating letters
+            const letters = text.split('');
+            letters.forEach((letter, index) => {
+                setTimeout(() => {
+                    const span = document.createElement('span');
+                    span.className = 'letter';
+                    span.textContent = letter;
+                    span.style.animationDelay = `${index * 0.05}s`;
+                    echoDisplay.appendChild(span);
+                }, index * 50);
+            });
+
+            // Show echo message
+            setTimeout(() => {
+                echoMessage.textContent = generateEchoMessage(currentInput);
+            }, text.length * 50 + 1000);
+
+            // Placeholder echo sound (could be replaced with actual audio)
+            playEchoSound();
+        }
+
+        // Placeholder echo sound
+        function playEchoSound() {
+            // In a real implementation, you would play an actual audio file:
+            // const audio = new Audio('echo.wav');
+            // audio.play();
+            console.log('🔊 Echo sound playing...');
+        }
+
+        // Pulse background effect
+        function pulseBackground() {
+            document.body.classList.add('pulse');
+            setTimeout(() => {
+                document.body.classList.remove('pulse');
+            }, 500);
+        }
+
+        // Change background hue
+        function changeBackgroundHue() {
+            const hueClass = `hue-shift-${interactionCount % 3 + 1}`;
+            document.body.className = hueClass;
+        }
+
+        // Save echo to file
+        function saveEcho() {
+            const content = `Echo Machine - Interaction ${interactionCount}\n\n` +
+                          `Original: ${currentInput}\n\n` +
+                          `Echo: ${currentEcho}\n\n` +
+                          `${echoMessage.textContent}\n\n` +
+                          `---\n` +
+                          `Saved on ${new Date().toLocaleString()}`;
+
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `echo-${Date.now()}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Event listeners
+        startBtn.addEventListener('click', () => {
+            showScene(inputScene);
+            textInput.focus();
+        });
+
+        sendTextBtn.addEventListener('click', () => {
+            const input = textInput.value.trim();
+            if (input) {
+                currentInput = input;
+                currentEcho = transformText(input);
+                interactionCount++;
+
+                // Pulse and transition
+                pulseBackground();
+                inputScene.classList.remove('active');
+
+                setTimeout(() => {
+                    if (interactionCount >= 3) {
+                        showScene(endingScene);
+                    } else {
+                        showScene(echoScene);
+                        animateEcho(currentEcho);
+                    }
+                }, 800);
+
+                textInput.value = '';
+            }
+        });
+
+        recordVoiceBtn.addEventListener('click', () => {
+            // Voice recording simulation
+            alert('Voice recording feature coming soon!\n\nFor now, please use the text input to interact with the Echo Machine.');
+        });
+
+        sendAnotherBtn.addEventListener('click', () => {
+            changeBackgroundHue();
+            showScene(inputScene);
+            textInput.focus();
+        });
+
+        saveEchoBtn.addEventListener('click', () => {
+            saveEcho();
+        });
+
+        restartBtn.addEventListener('click', () => {
+            interactionCount = 0;
+            document.body.className = '';
+            showScene(inputScene);
+            textInput.focus();
+        });
+
+        // Allow Enter key to submit
+        textInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendTextBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>
