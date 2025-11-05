@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rewrite Me: Fixed Blanks Edition</title>
+  <style>
+    /* ===== CSS RESET & BASE ===== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      /* Default theme (neutral) */
+      --accent: #6B7280;
+      --bg-from: #F9FAFB;
+      --bg-to: #E5E7EB;
+      --text-primary: #1F2937;
+      --text-secondary: #6B7280;
+      --border: #D1D5DB;
+      --error: #DC2626;
+      --transition: 220ms ease;
+    }
+
+    /* Theme variants based on DECISION */
+    body[data-theme="stay"] {
+      --accent: #FF7A59;
+      --bg-from: #FFF3E8;
+      --bg-to: #FFD7B5;
+    }
+
+    body[data-theme="leave"] {
+      --accent: #3C78D8;
+      --bg-from: #E6F2FF;
+      --bg-to: #C9E3FF;
+    }
+
+    body[data-theme="begin again"] {
+      --accent: #2CB67D;
+      --bg-from: #E9FFE9;
+      --bg-to: #C8F7CF;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, var(--bg-from) 0%, var(--bg-to) 100%);
+      background-attachment: fixed;
+      color: var(--text-primary);
+      line-height: 1.6;
+      transition: background var(--transition);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    /* ===== CONTAINER ===== */
+    .container {
+      max-width: 760px;
+      width: 100%;
+      text-align: center;
+    }
+
+    /* ===== PANEL SYSTEM ===== */
+    .panel {
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== INTRO PANEL ===== */
+    #intro h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--accent);
+      transition: color var(--transition);
+    }
+
+    #intro .subtitle {
+      font-size: 1.125rem;
+      color: var(--text-secondary);
+      margin-bottom: 2.5rem;
+      font-style: italic;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 0.875rem 2rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all var(--transition);
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .btn:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--accent);
+      border: 2px solid var(--accent);
+    }
+
+    .btn-small {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+    }
+
+    /* ===== EDITOR PANEL ===== */
+    #editor {
+      background: white;
+      border-radius: 16px;
+      padding: 2.5rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    }
+
+    .story-container {
+      margin-bottom: 2rem;
+    }
+
+    .story-text {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 1.25rem;
+      line-height: 2;
+      text-align: left;
+      white-space: pre-wrap;
+      margin-bottom: 2rem;
+    }
+
+    /* ===== INPUT STYLING ===== */
+    .story-input {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 1.25rem;
+      border: none;
+      border-bottom: 2px solid var(--accent);
+      background: transparent;
+      padding: 0.125rem 0.25rem;
+      min-width: 120px;
+      width: auto;
+      text-align: center;
+      transition: all var(--transition);
+      outline: none;
+    }
+
+    .story-input:focus {
+      border-bottom-width: 3px;
+      box-shadow: 0 2px 0 var(--accent);
+    }
+
+    .story-input.invalid {
+      border-bottom-color: var(--error);
+      animation: shake 0.3s;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      75% { transform: translateX(4px); }
+    }
+
+    /* Input wrapper for tooltip */
+    .input-wrapper {
+      display: inline-block;
+      position: relative;
+    }
+
+    .input-tooltip {
+      position: absolute;
+      bottom: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--error);
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .input-wrapper.show-error .input-tooltip {
+      opacity: 1;
+    }
+
+    /* ===== CHIPS PREVIEW ===== */
+    .chips-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+      min-height: 36px;
+    }
+
+    .chip {
+      background: var(--accent);
+      color: white;
+      padding: 0.375rem 0.875rem;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all var(--transition);
+    }
+
+    .chip.empty {
+      background: var(--border);
+      color: var(--text-secondary);
+    }
+
+    /* ===== CONTROLS ===== */
+    .controls {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ===== ENDING PANEL ===== */
+    #ending {
+      background: white;
+      border-radius: 16px;
+      padding: 2.5rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+      text-align: left;
+    }
+
+    #ending h2 {
+      text-align: center;
+      color: var(--accent);
+      margin-bottom: 2rem;
+      font-size: 2rem;
+    }
+
+    .composed-story {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 1.25rem;
+      line-height: 2;
+      white-space: pre-wrap;
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      background: var(--bg-from);
+      border-radius: 12px;
+      border-left: 4px solid var(--accent);
+    }
+
+    .composed-story .highlight {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* ===== SUMMARY CARD ===== */
+    .summary-card {
+      background: var(--bg-from);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .summary-card h3 {
+      font-size: 1.125rem;
+      margin-bottom: 1rem;
+      color: var(--accent);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.5rem 1rem;
+      font-size: 0.95rem;
+    }
+
+    .summary-label {
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .summary-value {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    /* ===== ENDING TEXT ===== */
+    .ending-text {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 1.125rem;
+      line-height: 1.8;
+      font-style: italic;
+      color: var(--text-secondary);
+      margin-bottom: 0.75rem;
+      white-space: pre-wrap;
+    }
+
+    .ending-id {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      text-align: right;
+      margin-bottom: 2rem;
+      font-weight: 600;
+    }
+
+    .ending-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ===== TOAST NOTIFICATIONS ===== */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--text-primary);
+      color: white;
+      padding: 0.875rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition);
+      z-index: 1000;
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 640px) {
+      #intro h1 { font-size: 2rem; }
+      #editor, #ending { padding: 1.5rem; }
+      .story-text, .composed-story { font-size: 1.125rem; }
+      .story-input { font-size: 1.125rem; min-width: 100px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- ===== INTRO PANEL ===== -->
+    <div id="intro" class="panel active">
+      <h1>Rewrite Me: Fixed Blanks Edition</h1>
+      <p class="subtitle">A story with five fixed choices</p>
+      <button class="btn" onclick="startEditor()">Begin</button>
+    </div>
+
+    <!-- ===== EDITOR PANEL ===== -->
+    <div id="editor" class="panel">
+      <div class="story-container">
+        <div class="story-text">I still remember that morning, though some details keep changing.
+We met on a <span class="input-wrapper" id="wrap-time">
+<input
+  type="text"
+  class="story-input"
+  id="blank-time"
+  list="list-time"
+  aria-label="Time of day"
+  autocomplete="off"
+  spellcheck="false"
+  maxlength="20"
+/>
+<span class="input-tooltip">Choose from the list</span>
+</span> at the <span class="input-wrapper" id="wrap-place">
+<input
+  type="text"
+  class="story-input"
+  id="blank-place"
+  list="list-place"
+  aria-label="Place"
+  autocomplete="off"
+  spellcheck="false"
+  maxlength="20"
+/>
+<span class="input-tooltip">Choose from the list</span>
+</span>.
+You were <span class="input-wrapper" id="wrap-verb">
+<input
+  type="text"
+  class="story-input"
+  id="blank-verb"
+  list="list-verb"
+  aria-label="Verb action"
+  autocomplete="off"
+  spellcheck="false"
+  maxlength="20"
+/>
+<span class="input-tooltip">Choose from the list</span>
+</span> while I held a small <span class="input-wrapper" id="wrap-object">
+<input
+  type="text"
+  class="story-input"
+  id="blank-object"
+  list="list-object"
+  aria-label="Object"
+  autocomplete="off"
+  spellcheck="false"
+  maxlength="20"
+/>
+<span class="input-tooltip">Choose from the list</span>
+</span>.
+When the curtain moved, we decided to <span class="input-wrapper" id="wrap-decision">
+<input
+  type="text"
+  class="story-input"
+  id="blank-decision"
+  list="list-decision"
+  aria-label="Decision"
+  autocomplete="off"
+  spellcheck="false"
+  maxlength="20"
+/>
+<span class="input-tooltip">Choose from the list</span>
+</span>.</div>
+      </div>
+
+      <!-- Datalists for input options -->
+      <datalist id="list-time">
+        <option value="morning">
+        <option value="midnight">
+        <option value="rainy evening">
+      </datalist>
+
+      <datalist id="list-place">
+        <option value="station">
+        <option value="river">
+        <option value="museum">
+      </datalist>
+
+      <datalist id="list-verb">
+        <option value="waiting">
+        <option value="running">
+        <option value="hiding">
+      </datalist>
+
+      <datalist id="list-object">
+        <option value="map">
+        <option value="letter">
+        <option value="key">
+      </datalist>
+
+      <datalist id="list-decision">
+        <option value="stay">
+        <option value="leave">
+        <option value="begin again">
+      </datalist>
+
+      <!-- Chips Preview -->
+      <div class="chips-preview" id="chips-preview">
+        <span class="chip empty" id="chip-time">_</span>
+        <span class="chip empty" id="chip-place">_</span>
+        <span class="chip empty" id="chip-verb">_</span>
+        <span class="chip empty" id="chip-object">_</span>
+        <span class="chip empty" id="chip-decision">_</span>
+      </div>
+
+      <!-- Controls -->
+      <div class="controls">
+        <button class="btn btn-secondary btn-small" onclick="randomizeBlanks()">Randomize</button>
+        <button class="btn btn-secondary btn-small" onclick="resetBlanks()">Reset</button>
+        <button class="btn btn-small" id="generate-btn" onclick="generateEnding()" disabled>Generate Ending</button>
+      </div>
+    </div>
+
+    <!-- ===== ENDING PANEL ===== -->
+    <div id="ending" class="panel">
+      <h2>Your Edited Story</h2>
+
+      <div class="composed-story" id="composed-story"></div>
+
+      <div class="summary-card">
+        <h3>Your Choices</h3>
+        <div class="summary-grid">
+          <span class="summary-label">Time:</span>
+          <span class="summary-value" id="summary-time">—</span>
+          <span class="summary-label">Place:</span>
+          <span class="summary-value" id="summary-place">—</span>
+          <span class="summary-label">Verb:</span>
+          <span class="summary-value" id="summary-verb">—</span>
+          <span class="summary-label">Object:</span>
+          <span class="summary-value" id="summary-object">—</span>
+          <span class="summary-label">Decision:</span>
+          <span class="summary-value" id="summary-decision">—</span>
+        </div>
+      </div>
+
+      <div class="ending-text" id="ending-text"></div>
+      <div class="ending-id" id="ending-id"></div>
+
+      <div class="ending-actions">
+        <button class="btn btn-small" onclick="copyStory()">Copy Story</button>
+        <button class="btn btn-secondary btn-small" onclick="editAgain()">Edit Again</button>
+        <button class="btn btn-secondary btn-small" onclick="saveJSON()">Save JSON</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast for notifications -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ===== STATE & OPTIONS =====
+    const OPTIONS = {
+      time: ['morning', 'midnight', 'rainy evening'],
+      place: ['station', 'river', 'museum'],
+      verb: ['waiting', 'running', 'hiding'],
+      object: ['map', 'letter', 'key'],
+      decision: ['stay', 'leave', 'begin again']
+    };
+
+    const state = {
+      time: '',
+      place: '',
+      verb: '',
+      object: '',
+      decision: ''
+    };
+
+    // ===== VALIDATION =====
+    function normalizeValue(value) {
+      return value.trim().toLowerCase();
+    }
+
+    function isValid(field, value) {
+      const normalized = normalizeValue(value);
+      return OPTIONS[field].includes(normalized);
+    }
+
+    function validateInput(field) {
+      const input = document.getElementById(`blank-${field}`);
+      const wrapper = document.getElementById(`wrap-${field}`);
+      const value = input.value;
+
+      if (!value) {
+        // Empty is not invalid, just incomplete
+        wrapper.classList.remove('show-error');
+        input.classList.remove('invalid');
+        state[field] = '';
+        updateChip(field, '');
+        updateGenerateButton();
+        return;
+      }
+
+      if (isValid(field, value)) {
+        // Valid
+        wrapper.classList.remove('show-error');
+        input.classList.remove('invalid');
+        state[field] = normalizeValue(value);
+        updateChip(field, input.value); // Display with user's casing
+      } else {
+        // Invalid
+        wrapper.classList.add('show-error');
+        input.classList.add('invalid');
+        state[field] = '';
+        updateChip(field, '');
+      }
+
+      // Update theme if decision changed
+      if (field === 'decision') {
+        updateTheme();
+      }
+
+      updateGenerateButton();
+    }
+
+    // ===== CHIPS PREVIEW =====
+    function updateChip(field, displayValue) {
+      const chip = document.getElementById(`chip-${field}`);
+      if (displayValue) {
+        chip.textContent = displayValue;
+        chip.classList.remove('empty');
+      } else {
+        chip.textContent = '_';
+        chip.classList.add('empty');
+      }
+    }
+
+    // ===== THEME =====
+    function updateTheme() {
+      const decision = state.decision;
+      if (decision === 'stay' || decision === 'leave' || decision === 'begin again') {
+        document.body.setAttribute('data-theme', decision);
+      } else {
+        document.body.removeAttribute('data-theme');
+      }
+    }
+
+    // ===== GENERATE BUTTON =====
+    function updateGenerateButton() {
+      const allValid = Object.keys(state).every(field => state[field] !== '');
+      document.getElementById('generate-btn').disabled = !allValid;
+    }
+
+    // ===== INPUT LISTENERS =====
+    function setupInputs() {
+      Object.keys(OPTIONS).forEach(field => {
+        const input = document.getElementById(`blank-${field}`);
+
+        // Validate on input
+        input.addEventListener('input', () => {
+          validateInput(field);
+        });
+
+        // Validate on blur
+        input.addEventListener('blur', () => {
+          validateInput(field);
+        });
+
+        // Prevent HTML paste
+        input.addEventListener('paste', (e) => {
+          e.preventDefault();
+          const text = (e.clipboardData || window.clipboardData).getData('text');
+          const cleaned = text.replace(/<[^>]*>/g, '').trim();
+          document.execCommand('insertText', false, cleaned);
+        });
+
+        // Enter key triggers generate if enabled
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            const btn = document.getElementById('generate-btn');
+            if (!btn.disabled) {
+              generateEnding();
+            }
+          }
+        });
+
+        // Auto-resize input to content
+        input.addEventListener('input', function() {
+          this.style.width = (this.value.length || 10) + 'ch';
+        });
+      });
+    }
+
+    // ===== PANEL NAVIGATION =====
+    function showPanel(panelId) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.getElementById(panelId).classList.add('active');
+    }
+
+    function startEditor() {
+      showPanel('editor');
+      // Focus first input
+      setTimeout(() => document.getElementById('blank-time').focus(), 100);
+    }
+
+    // ===== RANDOMIZE =====
+    function randomizeBlanks() {
+      Object.keys(OPTIONS).forEach(field => {
+        const options = OPTIONS[field];
+        const randomValue = options[Math.floor(Math.random() * options.length)];
+        const input = document.getElementById(`blank-${field}`);
+        input.value = randomValue;
+        validateInput(field);
+      });
+    }
+
+    // ===== RESET =====
+    function resetBlanks() {
+      Object.keys(OPTIONS).forEach(field => {
+        const input = document.getElementById(`blank-${field}`);
+        input.value = '';
+        const wrapper = document.getElementById(`wrap-${field}`);
+        wrapper.classList.remove('show-error');
+        input.classList.remove('invalid');
+        state[field] = '';
+        updateChip(field, '');
+      });
+      document.body.removeAttribute('data-theme');
+      updateGenerateButton();
+    }
+
+    // ===== ENDING RULES =====
+    function determineEnding() {
+      const { time, place, verb, object, decision } = state;
+
+      // R1: leave → COLD_FAREWELL
+      if (decision === 'leave') {
+        return {
+          id: 'COLD_FAREWELL',
+          text: `You trimmed the moment down to travel size.
+Departure is a sentence without a comma, and you carried it well.`
+        };
+      }
+
+      // R2: begin again → BLOOM_RESTART
+      if (decision === 'begin again') {
+        return {
+          id: 'BLOOM_RESTART',
+          text: `You reopened the day like a door.
+It wasn't a return, but a start that keeps starting.`
+        };
+      }
+
+      // R3: key + museum → THRESHOLD
+      if (object === 'key' && place === 'museum') {
+        return {
+          id: 'THRESHOLD',
+          text: `Among rooms that remember everything, you chose the key.
+Some doors open forward; some open into a different kind of past.`
+        };
+      }
+
+      // R4: map + station → JOURNEY
+      if (object === 'map' && place === 'station') {
+        return {
+          id: 'JOURNEY',
+          text: `The station gave the map a pulse.
+Staying still felt like moving, and the tracks agreed.`
+        };
+      }
+
+      // R5: stay + midnight + hiding → QUIET_SHELTER
+      if (decision === 'stay' && time === 'midnight' && verb === 'hiding') {
+        return {
+          id: 'QUIET_SHELTER',
+          text: `Midnight kept the noise outside.
+Hiding turned into shelter, and shelter into a promise.`
+        };
+      }
+
+      // R6: stay + running → STILLNESS
+      if (decision === 'stay' && verb === 'running') {
+        return {
+          id: 'STILLNESS',
+          text: `You let the running stop inside the sentence.
+The street kept going; you didn't need to.`
+        };
+      }
+
+      // R7: stay → WARM_KEEP
+      if (decision === 'stay') {
+        return {
+          id: 'WARM_KEEP',
+          text: `You kept the part that holds.
+The curtain still moves, but now it feels like breathing.`
+        };
+      }
+
+      // R8: default → NEUTRAL_DRIFT
+      return {
+        id: 'NEUTRAL_DRIFT',
+        text: `You adjusted the wording and the day went on.
+Not everything needs a headline to mean something.`
+      };
+    }
+
+    // ===== GENERATE ENDING =====
+    function generateEnding() {
+      // Get display values from inputs (preserve user casing)
+      const displayValues = {
+        time: document.getElementById('blank-time').value,
+        place: document.getElementById('blank-place').value,
+        verb: document.getElementById('blank-verb').value,
+        object: document.getElementById('blank-object').value,
+        decision: document.getElementById('blank-decision').value
+      };
+
+      // Compose story with highlights
+      const composedStory = `I still remember that morning, though some details keep changing.
+We met on a <span class="highlight">${displayValues.time}</span> at the <span class="highlight">${displayValues.place}</span>.
+You were <span class="highlight">${displayValues.verb}</span> while I held a small <span class="highlight">${displayValues.object}</span>.
+When the curtain moved, we decided to <span class="highlight">${displayValues.decision}</span>.`;
+
+      document.getElementById('composed-story').innerHTML = composedStory;
+
+      // Summary
+      document.getElementById('summary-time').textContent = displayValues.time;
+      document.getElementById('summary-place').textContent = displayValues.place;
+      document.getElementById('summary-verb').textContent = displayValues.verb;
+      document.getElementById('summary-object').textContent = displayValues.object;
+      document.getElementById('summary-decision').textContent = displayValues.decision;
+
+      // Determine ending
+      const ending = determineEnding();
+      document.getElementById('ending-text').textContent = ending.text;
+      document.getElementById('ending-id').textContent = `Ending: ${ending.id}`;
+
+      // Show ending panel
+      showPanel('ending');
+    }
+
+    // ===== COPY STORY =====
+    function copyStory() {
+      const displayValues = {
+        time: document.getElementById('blank-time').value,
+        place: document.getElementById('blank-place').value,
+        verb: document.getElementById('blank-verb').value,
+        object: document.getElementById('blank-object').value,
+        decision: document.getElementById('blank-decision').value
+      };
+
+      const storyText = `I still remember that morning, though some details keep changing.
+We met on a ${displayValues.time} at the ${displayValues.place}.
+You were ${displayValues.verb} while I held a small ${displayValues.object}.
+When the curtain moved, we decided to ${displayValues.decision}.`;
+
+      const ending = determineEnding();
+      const fullText = `${storyText}\n\n${ending.text}`;
+
+      navigator.clipboard.writeText(fullText).then(() => {
+        showToast('Copied to clipboard!');
+      }).catch(() => {
+        showToast('Failed to copy');
+      });
+    }
+
+    // ===== EDIT AGAIN =====
+    function editAgain() {
+      showPanel('editor');
+    }
+
+    // ===== SAVE JSON =====
+    function saveJSON() {
+      const ending = determineEnding();
+      const data = {
+        time: state.time,
+        place: state.place,
+        verb: state.verb,
+        object: state.object,
+        decision: state.decision,
+        endingId: ending.id,
+        timestamp: new Date().toISOString()
+      };
+
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `rewrite-me-${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      showToast('JSON saved!');
+    }
+
+    // ===== TOAST =====
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
+    }
+
+    // ===== INITIALIZE =====
+    document.addEventListener('DOMContentLoaded', () => {
+      setupInputs();
+    });
+  </script>
+</body>
+</html>
